@@ -1,0 +1,25 @@
+# docker compose docs: https://docs.docker.com/compose/compose-file/
+
+version: '3.7'
+
+services:
+
+  memcached:
+    image: memcached
+    command: memcached -v -m 1000
+    ports:
+      - "${CACHE_PORT}:${CACHE_PORT}"
+
+  server:
+    image: python:3.8
+    command: go run cmd/server/main.go
+    working_dir: /src
+    environment:
+      PORT: "${SERVER_PORT}"
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    volumes:
+      # mount source code
+      - .:/src
+    links:
+      - memcached
