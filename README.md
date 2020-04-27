@@ -15,6 +15,4 @@ The following tools should be installed with homebrew:
 And the following global tools should be installed with pip:
 
 - pipenv
-- black
 - pytest
-- pylint

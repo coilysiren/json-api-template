@@ -10,14 +10,7 @@ help: # automatically documents the makefile, by outputing everything behind a #
 	@./scripts/check_npx.sh
 
 run: .init ## 🏃🏽‍♀️ Run local web server
-	docker-compose up memcached server
+	docker-compose up --remove-orphans
 
 unit-test: .init ## ✅ Run unit tests
 	ls
-
-integration-test: .init ## ✅ Run the integration tests
-	docker-compose up --abort-on-container-exit --remove-orphans
-
-test-all: .init ## ✅ Run unit tests and then integration tests
-	$(MAKE) unit-test
-	$(MAKE) integration-test
