@@ -5,15 +5,39 @@ version: '3.7'
 
 services:
 
-  web:
-    container_name: web
+  database:
+    container_name: database
+    image: postgres:12
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+
+  migrations:
+    container_name: migrations
+    build: .
+    command: bash -c "pipenv sync"
+    working_dir: /project
+    environment:
+      PIPENV_VENV_IN_PROJECT: "${PIPENV_VENV_IN_PROJECT}"
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}"
+    volumes:
+      - .:/project
+    links:
+      - database
+
+  server:
+    container_name: server
     build: .
     command: bash -c "pipenv sync && pipenv run flask run --port ${SERVER_PORT} --host 0.0.0.0"
     working_dir: /project
     environment:
       PIPENV_VENV_IN_PROJECT: "${PIPENV_VENV_IN_PROJECT}"
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}"
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     volumes:
-      # mount root directory
       - .:/project
+    links:
+      - database
+      - migrations

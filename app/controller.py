@@ -1,12 +1,19 @@
-# project layout
+# [[ project layout ]]
+#
+# [ server viewpoint ]
 #
 # server
-#   -> views
-#       -> controller (you are here!)
-#           -> models
+#   -> database
+#   -> routes
+#       -> views
+#           -> controller (🗺 you are here!)
+#               -> models
 #
-# ( brief description )
-
+# [ migrations viewpoint ]
+#
+# migrations
+#   -> database
+#   -> models
 
 class Controller(object):
     pass

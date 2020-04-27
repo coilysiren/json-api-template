@@ -1,11 +1,19 @@
-# project layout
+# [[ project layout ]]
+#
+# [ server viewpoint ]
 #
 # server
-#   -> views (you are here!)
-#       -> controller
-#           -> models
+#   -> database
+#   -> routes
+#       -> views (🗺 you are here!)
+#           -> controller
+#               -> models
 #
-# ( brief description )
+# [ migrations viewpoint ]
+#
+# migrations
+#   -> database
+#   -> models
 
 
 # builtin imports

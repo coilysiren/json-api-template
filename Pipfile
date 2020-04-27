@@ -6,6 +6,8 @@ verify_ssl = true
 [packages]
 flask = "*"
 python-dotenv = "*"
+sqlalchemy = "*"
+alembic = "*"
 
 [requires]
 python_version = "3.8"
