@@ -29,9 +29,9 @@ Base = sqlalchemy_declarative.declarative_base()
 
 
 class User(Base):
-    __tablename__ = 'users'
-    id = sqlalchemy.Column(Integer, primary_key=True)
-    name = sqlalchemy.Column(String)
+    __tablename__ = "users"
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    name = sqlalchemy.Column(sqlalchemy.String)
 
     def __repr__(self):
-       return f"<User(name='{self.name}')>"
+        return f"<User(name='{self.name}')>"

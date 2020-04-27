@@ -9,6 +9,9 @@ help: # automatically documents the makefile, by outputing everything behind a #
 	@./scripts/check_yq.sh
 	@./scripts/check_npx.sh
 
+dev: ## 🛠 setup developement environment
+	PIPENV_VENV_IN_PROJECT=true pipenv install
+
 run: .init ## 🏃🏽‍♀️ Run local web server
 	docker-compose up --remove-orphans
 

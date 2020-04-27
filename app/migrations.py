@@ -23,16 +23,15 @@
 import alembic
 
 # local imports
-import .database
-import .models
+from . import database, models
 
 
 def run_migrations():
-    '''
+    """
     run_migations runs "online" migrations via alembic
 
     docs => https://alembic.sqlalchemy.org/en/latest/tutorial.html
-    '''
+    """
     # grab database engine
     engine = database.get_database_connection()
 
@@ -40,8 +39,7 @@ def run_migrations():
     with engine.connect() as connection:
         # configure alembic
         alembic.context.configure(
-            connection=connection,
-            target_metadata=models.Base.metadata,
+            connection=connection, target_metadata=models.Base.metadata,
         )
         # and open a transaction to run migrations
         with alembic.context.begin_transaction():

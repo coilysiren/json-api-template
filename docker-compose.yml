@@ -16,7 +16,7 @@ services:
   migrations:
     container_name: migrations
     build: .
-    command: bash -c "pipenv sync"
+    command: bash -c "pipenv install --system"
     working_dir: /project
     environment:
       PIPENV_VENV_IN_PROJECT: "${PIPENV_VENV_IN_PROJECT}"
@@ -29,7 +29,7 @@ services:
   server:
     container_name: server
     build: .
-    command: bash -c "pipenv sync && pipenv run flask run --port ${SERVER_PORT} --host 0.0.0.0"
+    command: bash -c "pipenv install --system && pipenv run flask run --port ${SERVER_PORT} --host 0.0.0.0"
     working_dir: /project
     environment:
       PIPENV_VENV_IN_PROJECT: "${PIPENV_VENV_IN_PROJECT}"

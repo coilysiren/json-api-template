@@ -23,14 +23,14 @@
 import flask
 
 # local imports
-import .views
+from . import views
 
 
 def setup_routes(app: flask.Flask) -> flask.Flask:
-    '''
+    """
     setup_routes attaches our views to our routes
 
     docs => https://flask.palletsprojects.com/en/1.1.x/quickstart/#routing
-    '''
+    """
     app.route("/", methods=["GET"])(views.index)
     return app

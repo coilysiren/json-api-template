@@ -25,15 +25,15 @@ import dotenv
 import flask
 
 # local imports
-import .routes
+from . import routes
 
 
 def create_app():
-    '''
+    """
     create_app creates the flask application
 
     docs => https://flask.palletsprojects.com/en/1.1.x/patterns/appfactories/
-    '''
+    """
     # environment variables
     dotenv.load_dotenv()
     # flask configuration
