@@ -1,7 +1,7 @@
 import database.connection
+import database.models as models
 import server.errors as errors
 import sqlalchemy.orm as orm
-from database.models import User
 from server.decider import Decider
 
 
@@ -25,10 +25,13 @@ class __Controller(object):
         if name == "":
             raise errors.InvalidUserInput("`name` was empty")
 
-        print(f"name is {name}")
+        # do business logic
+        user = models.User(name=name)
+        self.session.add(user)
+        self.session.commit()
 
         # initalize outputs
-        output = {}
+        output = user.json()
 
         return output
 
