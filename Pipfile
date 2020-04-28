@@ -18,6 +18,7 @@ pylint = "*"
 black = "*"
 pytest = "*"
 parameterized = "*"
+pytest-watch = "*"
 
 [pipenv]
 allow_prereleases = true

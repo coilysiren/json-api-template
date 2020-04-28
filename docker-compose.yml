@@ -18,7 +18,7 @@ services:
   tests:
     container_name: tests
     build: .
-    command: pytest tests
+    command: pytest
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}"
     volumes:

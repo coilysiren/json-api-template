@@ -16,3 +16,7 @@ run: .init ## 🏃🏽‍♀️ Run local web server
 test: .init ## ✅ Run tests
 	docker-compose build tests
 	docker-compose run tests
+
+test-watch: .init ## ✅ Run tests 🦅 and watch for changes
+	docker-compose build tests
+	docker-compose run tests ptw
