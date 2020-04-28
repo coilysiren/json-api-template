@@ -4,20 +4,22 @@
 
 ## Development Setup
 
-This project makes heavy use of docker, so that following tools are the only ones **required** for building the project in a basic fashion:
+**[ required ]** This project makes heavy use of docker, so that following tools are the only ones required for building the project in a basic fashion:
 
 - docker
 - docker-compose
 
-**Optionally** if you want to setup more complex development tooling (editor auto-complete, linters, debugging, etc) then you will also need all of the following:
+**[ optional ]** If you want to setup more complex development tooling (editor auto-complete, linters, debugging, etc) then you will also need all of the following:
 
-- homebrew, and the following homebrew installed tools
+- homebrew via https://brew.sh/, and the following homebrew installed tools via `brew install $tool`
   - postgres
-  - python @ 3.8
-- python above comes with pip, and via pip you will also need the following
+  - python@3.8
+- the above python install above comes with pip, and via pip you will also want to **globally** install the following via `pip install $tool`
+  - pipenv
   - pylint
   - pytest
   - black
+- finally, run `make dev` to initialize a **local** installation of all of the above dev tools
 
 ## Development Workflow
 

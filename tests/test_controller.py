@@ -47,9 +47,9 @@ class TestController(unittest.TestCase):
             s.split(2)
 
     def test_create_user(self):
-        output = controller.create_user("")
+        output = self.controller.create_user("")
         assert output is not {}
 
     def test_create_user_two(self):
-        output = controller.create_user("")
+        output = self.controller.create_user("")
         assert output is {}

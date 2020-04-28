@@ -5,7 +5,7 @@ from server.decider import Decider
 
 
 class __Controller(object):
-    session: orm.Session = None
+    session: orm.Session
 
     def set_session(self, session):
         self.session = session
