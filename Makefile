@@ -10,10 +10,10 @@ help: # automatically documents the makefile, by outputing everything behind a #
 	@./scripts/check_npx.sh
 
 dev: ## 🛠 setup developement environment
-	PIPENV_VENV_IN_PROJECT=true pipenv install
+	PIPENV_VENV_IN_PROJECT=true pipenv install --dev
 
 run: .init ## 🏃🏽‍♀️ Run local web server
-	docker-compose up --remove-orphans
+	docker-compose up --remove-orphans --build
 
-unit-test: .init ## ✅ Run unit tests
+test: .init ## ✅ Run unit tests
 	ls

@@ -25,10 +25,10 @@ import dotenv
 import flask
 
 # local imports
-from . import routes
+import app.routes
 
 
-def create_app():
+def create_app() -> flask.Flask:
     """
     create_app creates the flask application
 
@@ -36,6 +36,9 @@ def create_app():
     """
     # environment variables
     dotenv.load_dotenv()
+
     # flask configuration
-    app = flask.Flask(__name__)
-    app = routes.setup_routes(app)
+    server = flask.Flask(__name__)
+    server = app.routes.setup_routes(server)
+
+    return server

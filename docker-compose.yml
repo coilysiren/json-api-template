@@ -12,14 +12,15 @@ services:
       POSTGRES_DB: "${POSTGRES_DB}"
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    ports:
+      - "${DATABASE_PORT}:${DATABASE_PORT}"
 
   migrations:
     container_name: migrations
     build: .
-    command: bash -c "pipenv install --system"
+    command: bash -c "./scripts/run_on_container_init.sh && alembic -c setup.cfg upgrade head"
     working_dir: /project
     environment:
-      PIPENV_VENV_IN_PROJECT: "${PIPENV_VENV_IN_PROJECT}"
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}"
     volumes:
       - .:/project
@@ -29,10 +30,9 @@ services:
   server:
     container_name: server
     build: .
-    command: bash -c "pipenv install --system && pipenv run flask run --port ${SERVER_PORT} --host 0.0.0.0"
+    command: bash -c "./scripts/run_on_container_init.sh && flask run --port ${SERVER_PORT} --host 0.0.0.0"
     working_dir: /project
     environment:
-      PIPENV_VENV_IN_PROJECT: "${PIPENV_VENV_IN_PROJECT}"
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}"
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
