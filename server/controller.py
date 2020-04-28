@@ -17,7 +17,7 @@ class __Controller(object):
             raise errors.InvalidUserInput("json input was invalid")
 
         # parse inputs (part 2)
-        name = data.get("name")
+        name = data.get("name", "")
         if not isinstance(name, str):
             raise errors.InvalidUserInput("`name` had invalid type")
 
@@ -29,15 +29,30 @@ class __Controller(object):
         user = models.User(name=name)
         self.session.add(user)
         self.session.commit()
-
-        # initalize outputs
         output = user.json()
 
         return output
 
     def get_users(self, data) -> {}:
-        # initalize outputs
-        output = {}
+        # parse inputs
+        if not hasattr(data, "get"):
+            raise errors.InvalidUserInput("json input was invalid")
+
+        # parse inputs (part 2)
+        name = data.get("name", "")
+        if name != "" and not isinstance(name, str):
+            raise errors.InvalidUserInput("`name` had invalid type")
+
+        # do business logic (eg. the get query)
+        if name == "":
+            query = self.session.query(models.User).all()
+        else:
+            query = self.session.query(models.User).filter_by(name=name)
+
+        # process output
+        output = {"users": []}
+        for user in query:
+            output["users"].append(user.json())
 
         return output
 
