@@ -1,8 +1,5 @@
-# isort: 3rd party imports
-import sqlalchemy.orm as orm
-
-# isort: our imports
 import database.connection
+import sqlalchemy.orm as orm
 from database.models import User
 from server.decider import Decider
 

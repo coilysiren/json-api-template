@@ -1,10 +1,8 @@
 # database.py sets up the database connection state
 
 
-# isort: stdlib imports
 import os
 
-# isort: 3rd party imports
 import sqlalchemy
 import sqlalchemy.orm as orm
 

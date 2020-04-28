@@ -1,11 +1,7 @@
 # routes.py attaches the views to the routes. It is invoked during server configuration
 # (eg at server startup time)
 
-
-# isort: 3rd party imports
 import flask
-
-# isort: our imports
 import server.views as views
 
 

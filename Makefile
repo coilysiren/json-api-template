@@ -15,5 +15,5 @@ dev: ## 🛠 setup developement environment
 run: .init ## 🏃🏽‍♀️ Run local web server
 	docker-compose up --remove-orphans --build
 
-test: .init ## ✅ Run unit tests
-	ls
+test: .init ## ✅ Run tests
+	docker-compose run tests

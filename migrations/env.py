@@ -2,10 +2,7 @@
 # that is run by alembic.
 
 
-# isort: 3rd party imports
 import alembic.context
-
-# isort: our imports
 import database.connection
 import database.models
 

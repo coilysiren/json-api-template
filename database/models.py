@@ -3,9 +3,9 @@
 # docs => https://docs.sqlalchemy.org/en/13/orm/tutorial.html
 
 
-# isort: 3rd party imports
 import sqlalchemy
 import sqlalchemy.ext.declarative as sqlalchemy_declarative
+
 
 # docs => https://docs.sqlalchemy.org/en/13/orm/tutorial.html#declare-a-mapping
 Base = sqlalchemy_declarative.declarative_base()

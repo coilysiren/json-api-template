@@ -1,9 +1,6 @@
-# isort: stdlib imports
 import json
 
-# isort: 3rd party imports
 import flask
-# isort: our imports
 from server.controller import controller
 
 

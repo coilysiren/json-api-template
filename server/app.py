@@ -3,12 +3,9 @@
 # obvious fatal configuration issues.
 
 
-# isort: 3rd party imports
+import database.connection
 import dotenv
 import flask
-
-# isort: our imports
-import database.connection
 import server.routes
 from server.controller import controller
 

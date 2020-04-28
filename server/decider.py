@@ -1,4 +1,3 @@
-# isort: our imports
 from database.models import User
 
 

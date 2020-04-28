@@ -15,10 +15,22 @@ services:
     ports:
       - "${DATABASE_PORT}:${DATABASE_PORT}"
 
+  tests:
+    container_name: tests
+    build: .
+    command: bash -c "pipenv install --system --dev && pytest tests"
+    working_dir: /project
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}"
+    volumes:
+      - .:/project
+    links:
+      - database
+
   migrations:
     container_name: migrations
     build: .
-    command: bash -c "./scripts/run_on_container_init.sh && alembic -c setup.cfg upgrade head"
+    command: bash -c "pipenv install --system && alembic -c setup.cfg upgrade head"
     working_dir: /project
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}"
@@ -30,7 +42,7 @@ services:
   server:
     container_name: server
     build: .
-    command: bash -c "./scripts/run_on_container_init.sh && flask run --port ${SERVER_PORT} --host 0.0.0.0"
+    command: bash -c "pipenv install --system && flask run --port ${SERVER_PORT} --host 0.0.0.0"
     working_dir: /project
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}"
