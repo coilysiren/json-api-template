@@ -19,6 +19,7 @@ black = "*"
 pytest = "*"
 parameterized = "*"
 pytest-watch = "*"
+pytest-cov = "*"
 
 [pipenv]
 allow_prereleases = true
