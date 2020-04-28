@@ -11,7 +11,8 @@ dev: ## 🛠  setup developement environment
 	PIPENV_VENV_IN_PROJECT=true pipenv install --dev
 
 run: .init ## 🏃🏽‍♀️ Run local web server
-	docker-compose up --remove-orphans --build
+	docker-compose up --remove-orphans --build server
 
 test: .init ## ✅ Run tests
+	docker-compose build tests
 	docker-compose run tests

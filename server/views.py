@@ -7,8 +7,6 @@ from server.controller import controller
 def create_user():
     # parse inputs
     data = flask.request.get_json()
-    if data == None:
-        data = {}
 
     # initalize outputs
     output = {}
@@ -22,15 +20,12 @@ def create_user():
     except BaseException:
         status_code = 500
 
-    # return
     return json.dumps(output), status_code
 
 
 def get_users():
     # parse inputs
     data = flask.request.get_json()
-    if data == None:
-        data = {}
 
     # initalize outputs
     output = {}
@@ -44,5 +39,4 @@ def get_users():
     except BaseException:
         status_code = 500
 
-    # return
     return json.dumps(output), status_code

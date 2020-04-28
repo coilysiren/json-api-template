@@ -17,6 +17,7 @@ python_version = "3.8"
 pylint = "*"
 black = "*"
 pytest = "*"
+parameterized = "*"
 
 [pipenv]
 allow_prereleases = true

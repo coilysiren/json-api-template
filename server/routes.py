@@ -11,6 +11,6 @@ def setup_routes(app: flask.Flask) -> flask.Flask:
 
     docs => https://flask.palletsprojects.com/en/1.1.x/quickstart/#routing
     """
-    app.route("/user", methods=["POST"])(views.create_user)
-    app.route("/user", methods=["GET"])(views.get_users)
+    app.route("/users", methods=["POST"])(views.create_user)
+    app.route("/users", methods=["GET"])(views.get_users)
     return app

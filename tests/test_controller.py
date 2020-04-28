@@ -3,8 +3,10 @@ import unittest
 import pytest
 
 import database.connection
+import server.errors as errors
 import sqlalchemy
 import sqlalchemy.orm as orm
+from parameterized import parameterized
 from server.controller import controller
 
 
@@ -32,24 +34,19 @@ class TestController(unittest.TestCase):
     def tearDown(self):
         self.transaction.rollback()
 
-    def test_upper(self):
-        self.assertEqual("foo".upper(), "FOO")
-
-    def test_isupper(self):
-        self.assertTrue("FOO".isupper())
-        self.assertFalse("Foo".isupper())
-
-    def test_split(self):
-        s = "hello world"
-        self.assertEqual(s.split(), ["hello", "world"])
-        # check that s.split fails when the separator is not a string
-        with self.assertRaises(TypeError):
-            s.split(2)
-
-    def test_create_user(self):
-        output = self.controller.create_user("")
-        assert output is not {}
-
-    def test_create_user_two(self):
-        output = self.controller.create_user("")
-        assert output is {}
+    @parameterized.expand(
+        [
+            ("", errors.InvalidUserInput),
+            (None, errors.InvalidUserInput),
+            ({}, errors.InvalidUserInput),
+            ({"not_relevant": True}, errors.InvalidUserInput),
+            ({"name": {}}, errors.InvalidUserInput),
+            ({"name": ""}, errors.InvalidUserInput),
+            ({"name": True}, errors.InvalidUserInput),
+            ({"name": None}, errors.InvalidUserInput),
+            ({"name": 1}, errors.InvalidUserInput),
+        ]
+    )
+    def test_create_user_bad_inputs(self, args, expectedError):
+        with self.assertRaises(expectedError):
+            self.controller.create_user(args)

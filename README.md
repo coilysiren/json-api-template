@@ -17,7 +17,6 @@
 - the above python install above comes with pip, and via pip you will also want to **globally** install the following via `pip install $tool`
   - pipenv
   - pylint
-  - pytest
   - black
 - finally, run `make dev` to initialize a **local** installation of all of the above dev tools
 
@@ -43,6 +42,7 @@ More esoteric commands are listed in the `./scripts/` folder, you will generally
 # [ server layer ]
 #
 # -> app.py
+#   -> errors.py
 #   -> routes.py
 #     -> views.py
 #   -> controller.py
