@@ -12,7 +12,24 @@ The following tools should be installed with homebrew:
 - yq / jq
 - python @ 3.8
 
-And the following global tools should be installed with pip:
+## Project Layout
 
-- pipenv
-- pytest
+```python
+# [ database layer ]
+#
+# -> connection.py
+# -> models.py
+#
+# [ migrations layer ]
+#
+# -> env.py
+# -> versions/*.py
+#
+# [ server viewpoint ]
+#
+# -> app.py
+#   -> routes.py
+#     -> views.py
+#   -> controller.py
+#     -> decider.py
+```
