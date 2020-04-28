@@ -1,4 +1,3 @@
-
 FROM python:3.8
 
 # it would be nice if the python container came with pipenv by default!
