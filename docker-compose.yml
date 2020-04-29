@@ -23,6 +23,8 @@ services:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}"
     volumes:
       - .:/project
+    links:
+      - database
 
   migrations:
     container_name: migrations
@@ -32,6 +34,8 @@ services:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}"
     volumes:
       - .:/project
+    links:
+      - database
 
   server:
     container_name: server
@@ -43,3 +47,5 @@ services:
       - "${SERVER_PORT}:${SERVER_PORT}"
     volumes:
       - .:/project
+    links:
+      - database
