@@ -78,6 +78,15 @@ class TestControllerCreateUser(ControllerTestCase):
         # testing assertions
         self.assertEqual(output["email"], email)
 
+    def test_create_user_no_repeat_emails(self):
+        # setup inputs
+        email = str(uuid.uuid4()) + "@example.com"
+        # logic under test
+        self._create_user(email=email)
+        # testing assertions
+        with self.assertRaises(errors.InvalidUserInput):
+            self._create_user(email=email)
+
     def test_create_user_session_persistence(self):
         # setup inputs
         email = str(uuid.uuid4()) + "@example.com"
@@ -154,6 +163,42 @@ class TestControllerGetUsers(ControllerTestCase):
     def test_get_limit_too_large(self):
         with self.assertRaises(errors.InvalidUserInput):
             self.controller.get_users({"limit": 9999999999999999999})
+
+    def test_get_pagination(self):
+        # setup
+        self._create_user()
+        self._create_user()
+        # logic under test
+        output_one = self.controller.get_users({"limit": 1, "page": 1})
+        output_two = self.controller.get_users({"limit": 1, "page": 2})
+        # testing assertions
+        self.assertNotEqual(output_one["users"][0]["id"], output_two["users"][0]["id"])
+
+    def test_clipped_pagination(self):
+        # setup
+        count = 5
+        for _ in range(count):
+            self._create_user()
+        # logic under test
+        output_one = self.controller.get_users({"limit": count - 1, "page": 2})
+        # testing assertions
+        # 2nd page should have 1 user
+        self.assertEqual(len(output_one["users"]), 1)
+
+    def test_page_two_of_three(self):
+        # setup
+        count = 9
+        for _ in range(count):
+            self._create_user()
+        # logic under test
+        output_one = self.controller.get_users({"limit": 3, "page": 2})
+        # testing assertions
+        self.assertEqual(len(output_one["users"]), 3)
+
+    def test_page_past_max_max(self):
+        self._create_user()
+        with self.assertRaises(errors.NotFound):
+            self.controller.get_users({"page": 9999999999})
 
 
 class TestControllerGetUser(ControllerTestCase):

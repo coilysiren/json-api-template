@@ -41,7 +41,16 @@ class __Controller(object):
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
-        # do business logic (eg. create a user)
+        # do business logic - part 1 (eg. check that there isnt a user with this email)
+        user = (
+            self.session.query(models.User).filter_by(email=userData["email"]).first()
+        )
+        if user is not None:
+            raise errors.InvalidUserInput(
+                "a user already exists with this email address"
+            )
+
+        # do business logic - part 2 (eg. create the user)
         user = models.User()
         user = schema.UserInputSchema.update_user(user, userData)
         self.session.add(user)
@@ -59,7 +68,10 @@ class __Controller(object):
             raise errors.InvalidUserInput(err.messages)
 
         # do business logic (eg. get users)
-        query = self.session.query(models.User).limit(queryData["limit"])
+        offset = (queryData["page"] - 1) * queryData["limit"]
+        query = self.session.query(models.User).limit(queryData["limit"]).offset(offset)
+        if query.count() == 0:
+            raise errors.NotFound(f"found no users for query input")
 
         # return query results
         output = schema.UserOutputSchema(many=True).load(query)

@@ -7,6 +7,7 @@ import sqlalchemy
 import sqlalchemy.ext.declarative as sqlalchemy_declarative
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, func
 
+
 # docs => https://docs.sqlalchemy.org/en/13/orm/tutorial.html#declare-a-mapping
 Base = sqlalchemy_declarative.declarative_base()
 
@@ -22,7 +23,7 @@ class User(Base):
     role = Column(String, nullable=False, default="")
     familyName = Column(String, nullable=False, default="")
     givenName = Column(String, nullable=False, default="")
-    smsUser = Column(Boolean, nullable=True, default=None)
+    smsUser = Column(Boolean, nullable=False, default=True)
     createTime = Column(DateTime, default=func.now())
     lastModified = Column(DateTime, onupdate=func.utc_timestamp())
 
