@@ -8,6 +8,7 @@ services:
   database:
     container_name: database
     image: postgres:12
+    stop_grace_period: 30s
     environment:
       POSTGRES_DB: "${POSTGRES_DB}"
       POSTGRES_USER: "${POSTGRES_USER}"

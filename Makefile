@@ -12,16 +12,16 @@ dev: ## 🛠  setup developement environment
 
 run: .init ## 🏃🏽‍♀️ Run local web server
 	docker-compose down
-	docker-compose build migrations
 	docker-compose up -d database
+	docker-compose build migrations
 	docker-compose run --rm migrations
 	docker-compose up --remove-orphans --build server
 
 name ?= "future optimization: enforce a name here"
 create-migration-revision: .init ## 📝 Create a new migration revision (inputs: name=<name>)
 	docker-compose down
-	docker-compose build migrations
 	docker-compose up -d database
+	docker-compose build migrations
 	docker-compose run --rm migrations
 	docker-compose run --rm migrations alembic -c setup.cfg revision --autogenerate -m "$(name)"
 
@@ -33,17 +33,17 @@ lint: .init ## 🧹 Run linters
 
 test: .init ## ✅ Run tests
 	docker-compose down
+	docker-compose up -d database
 	docker-compose build migrations
 	docker-compose build tests
-	docker-compose up -d database
 	docker-compose run --rm migrations
 	docker-compose run --rm tests pytest
 
 test-watch: .init ## ✅ Run tests 🦅 and watch for changes
 	docker-compose down
+	docker-compose up -d database
 	docker-compose build migrations
 	docker-compose build tests
-	docker-compose up -d database
 	docker-compose run --rm migrations
 	docker-compose run --rm tests ptw
 
