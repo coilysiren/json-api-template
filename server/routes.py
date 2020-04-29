@@ -13,4 +13,6 @@ def setup_routes(app: flask.Flask) -> flask.Flask:
     """
     app.route("/users", methods=["POST"])(views.create_user)
     app.route("/users", methods=["GET"])(views.get_users)
+    app.route("/users/:user_id", methods=["PUT"])(views.update_user)
+    app.route("/users/:user_id", methods=["GET"])(views.get_user)
     return app

@@ -43,3 +43,40 @@ def get_users():
         status_code = e.status_code
 
     return json.dumps(output), status_code
+
+
+def get_user(user_id):
+    # initalize outputs
+    output = {}
+    status_code = 200
+
+    # do business logic
+    try:
+        output = controller.get_user(user_id)
+
+    # process errors
+    except errors.ErrorWithStatus as e:
+        output = {"error": str(e)}
+        status_code = e.status_code
+
+    return json.dumps(output), status_code
+
+
+def update_user(user_id):
+    # parse inputs
+    data = flask.request.get_json()
+
+    # initalize outputs
+    output = {}
+    status_code = 200
+
+    # do business logic
+    try:
+        output = controller.update_user(user_id, data)
+
+    # process errors
+    except errors.ErrorWithStatus as e:
+        output = {"error": str(e)}
+        status_code = e.status_code
+
+    return json.dumps(output), status_code

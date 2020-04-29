@@ -1,6 +1,11 @@
-# `a27`
+# bluelink code test
 
-🚧 contents under construction 🚧
+## Decisions Made
+
+- null columns, defaults on columns
+- email and role are required
+- empty emails? empty roles?
+- no length on names => https://www.w3.org/International/questions/qa-personal-names#singlefield
 
 ## Development Setup
 
@@ -46,7 +51,7 @@ More esoteric commands are listed in the `./scripts/` folder, you will generally
 #   -> routes.py
 #     -> views.py
 #   -> controller.py
-#     -> decider.py
+#     -> schema.py
 #
 # [ tests layer ]
 #

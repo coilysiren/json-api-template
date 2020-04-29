@@ -7,4 +7,4 @@ name=${1:-"TODO: enforce migration name"}
 
 command="alembic -c setup.cfg revision --autogenerate -m \"$name\""
 
-docker-compose run migrations bash -c "pipenv install --system && $command"
+docker-compose run migrations bash -c "$command"

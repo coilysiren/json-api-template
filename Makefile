@@ -17,6 +17,14 @@ run: .init ## 🏃🏽‍♀️ Run local web server
 	docker-compose run --rm migrations
 	docker-compose up --remove-orphans --build server
 
+name ?= "TODO: enforce a name here"
+create-migration-revision: .init ## 📝 Create a new migration revision (inputs: name=<name>)
+	docker-compose down
+	docker-compose build migrations
+	docker-compose up -d database
+	docker-compose run --rm migrations
+	docker-compose run --rm migrations alembic -c setup.cfg revision --autogenerate -m "$(name)"
+
 test: .init ## ✅ Run tests
 	docker-compose down
 	docker-compose build migrations
