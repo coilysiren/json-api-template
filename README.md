@@ -73,8 +73,8 @@ http localhost:8000/users email=BAD_EMAIL
 http localhost:8000/users\?roles=standard\&roles=admin
 http localhost:8000/users\?roles=admin
 
-# make note of the id above, as it is needed in the following lines
-# it will most likely be "1"!
+# Make note of the id above, as it is needed in the following lines.
+# It will most likely be "1"!
 
 http localhost:8000/users/1
 http PUT localhost:8000/users/1 givenName=lynn
