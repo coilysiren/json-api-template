@@ -9,7 +9,7 @@ The schemas are all defined with marshmallow, which you can read about here
 """
 
 import database.models as models
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, pre_load
 
 
 class UserInputSchema(Schema):
@@ -19,7 +19,7 @@ class UserInputSchema(Schema):
     """
 
     # required fields
-    email = fields.Str(required=True)
+    email = fields.Email(required=True)
     role = fields.Str(required=True)
 
     # optional fields
@@ -27,15 +27,15 @@ class UserInputSchema(Schema):
     givenName = fields.Str()
     smsUser = fields.Boolean(allow_none=True)
 
-    def update_user(self, user: models.User) -> models.User:
+    def update_user(self, user: models.User, data: {}) -> models.User:
         """
-        update_user takes in a user, and updates that user with the current schema data
+        update_user takes in a user and schema data, and updates that user with the current schema data
         """
-        user.email = self.email
-        user.familyName = self.familyName
-        user.givenName = self.givenName
-        user.role = self.role
-        user.smsUser = self.smsUser
+        user.email = data.get("email")
+        user.role = data.get("role")
+        user.familyName = data.get("familyName")
+        user.givenName = data.get("givenName")
+        user.smsUser = data.get("smsUser")
         return user
 
 
@@ -53,7 +53,21 @@ class UserOutputSchema(UserInputSchema):
     }
     """
 
-    id = fields.Str()
+    id = fields.Integer()
+
+    @pre_load
+    def preprocess(self, user: models.User, **kwargs) -> {}:
+        """
+        from_model takes in a user model, and creates the user output schema data
+        """
+        return {
+            "id": user.id,
+            "email": user.email,
+            "role": user.role,
+            "familyName": user.familyName,
+            "givenName": user.givenName,
+            "smsUser": user.smsUser,
+        }
 
 
 class UserQuerySchema(Schema):

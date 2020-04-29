@@ -6,6 +6,7 @@
 - email and role are required
 - empty emails? empty roles?
 - no length on names => https://www.w3.org/International/questions/qa-personal-names#singlefield
+- email validation
 
 ## Development Setup
 

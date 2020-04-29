@@ -43,12 +43,10 @@ class TestController(DBTransactionTestCase):
         session = super().setUp()
         self.controller.set_session(session)
 
-    def create_user(self, name=""):
-        if name == "":
-            name = str(uuid.uuid4())
-        user = models.User(name=name)
-        self.controller.session.add(user)
-        self.controller.session.commit()
+    def _create_user(self, email="", role="standard"):
+        if email == "":
+            email = str(uuid.uuid4()) + "@example.com"
+        return self.controller.create_user({"email": email, "role": role})
 
     @parameterized.expand(
         [
@@ -82,47 +80,55 @@ class TestController(DBTransactionTestCase):
 
     def test_create_user_valid_input(self):
         # setup inputs
-        name = "lynn cyrin"
+        email = str(uuid.uuid4()) + "@example.com"
         # logic under test
-        output = self.controller.create_user({"name": name})
+        output = self._create_user(email=email)
         # assertions
-        self.assertEqual(output["name"], name)
+        self.assertEqual(output["email"], email)
 
     def test_create_user_session_persistence(self):
         # setup inputs
-        name = "luna faye"
+        email = str(uuid.uuid4()) + "@example.com"
         # logic under test
-        self.controller.create_user({"name": name})
+        self._create_user(email=email)
         # assertions
-        query = self.controller.session.query(models.User).filter_by(name=name).first()
-        self.assertIsInstance(query, models.User)
-        self.assertEqual(query.name, name)
+        output = (
+            self.controller.session.query(models.User).filter_by(email=email).first()
+        )
+        self.assertIsInstance(output, models.User)
+        self.assertEqual(output.email, email)
 
     def test_create_user_with_uuid_and_control_case(self):
+        # setup inputs
+        email = str(uuid.uuid4()) + "@example.com"
         # control case
-        name = str(uuid.uuid4())
-        query = self.controller.session.query(models.User).filter_by(name=name).first()
-        self.assertIsNone(query)
+        output = (
+            self.controller.session.query(models.User).filter_by(email=email).first()
+        )
+        self.assertIsNone(output)
         # logic under test
-        self.controller.create_user({"name": name})
+        self._create_user(email=email)
         # test case
-        query = self.controller.session.query(models.User).filter_by(name=name).first()
-        self.assertIsNotNone(query)
+        output = (
+            self.controller.session.query(models.User).filter_by(email=email).first()
+        )
+        self.assertIsNotNone(output)
 
     def test_create_then_get(self):
         # setup inputs
-        name = str(uuid.uuid4())
+        email = str(uuid.uuid4()) + "@example.com"
         # logic under test
-        self.controller.create_user({"name": name})
-        output = self.controller.get_users({"name": name})
-        # test case
-        self.assertEqual(output["users"][0]["name"], name)
-
-    def test_get_multiple(self):
-        # logic under test
-        self.controller.create_user({"name": str(uuid.uuid4())})
-        self.controller.create_user({"name": str(uuid.uuid4())})
-        self.controller.create_user({"name": str(uuid.uuid4())})
+        self._create_user(email=email)
         output = self.controller.get_users({})
         # test case
-        self.assertEqual(len(output["users"]), 3)
+        self.assertEqual(output["users"][0]["email"], email)
+
+    def test_get_multiple(self):
+        # setup
+        count = 3
+        for _ in range(count):
+            self._create_user()
+        # logic under test
+        output = self.controller.get_users({})
+        # test case
+        self.assertEqual(len(output["users"]), count)

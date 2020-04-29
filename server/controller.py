@@ -20,13 +20,14 @@ class __Controller(object):
     def create_user(self, data) -> {}:
         # parse inputs
         try:
-            userInput = schema.UserInputSchema().load(data)
+            userInput = schema.UserInputSchema()
+            userData = userInput.load(data)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
         # do business logic (eg. create a user)
         user = models.User()
-        user = userInput.update_user(user)
+        user = userInput.update_user(user, userData)
         self.session.add(user)
         self.session.commit()
 
@@ -37,7 +38,8 @@ class __Controller(object):
     def get_users(self, data) -> {}:
         # parse inputs
         try:
-            userQuery = schema.UserQuerySchema().load(data)
+            userQuery = schema.UserQuerySchema()
+            userQuery.load(data)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
@@ -46,7 +48,7 @@ class __Controller(object):
 
         # return query results
         output = schema.UserOutputSchema(many=True).load(query)
-        return output
+        return {"users": output}
 
     def get_user(self, user_id) -> {}:
         # parse inputs
@@ -66,9 +68,11 @@ class __Controller(object):
         # parse inputs (part 1)
         if user_id == "":
             raise errors.InvalidUserInput("the `user_id` was empty")
+
         # parse inputs (part 2)
         try:
-            userInput = schema.UserInputSchema().load(data)
+            userInput = schema.UserInputSchema()
+            userData = userInput.load(data)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
@@ -79,7 +83,7 @@ class __Controller(object):
 
         # do business logic - part 2 (eg. update the user)
         user = models.User()
-        user = userInput.update_user(user)
+        user = userInput.update_user(user, userData)
         self.session.add(user)
         self.session.commit()
 
