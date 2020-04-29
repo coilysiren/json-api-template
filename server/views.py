@@ -16,6 +16,7 @@ thought of.
 import json
 
 import flask
+
 import server.errors as errors
 from server.controller import controller
 
@@ -33,9 +34,9 @@ def create_user():
         output = controller.create_user(data)
 
     # process errors
-    except errors.ErrorWithStatus as e:
-        output = {"error": str(e)}
-        status_code = e.status_code
+    except errors.ErrorWithStatus as err:
+        output = {"error": str(err)}
+        status_code = err.status_code
 
     return json.dumps(output), status_code
 
@@ -53,9 +54,9 @@ def get_users():
         output = controller.get_users(data)
 
     # process errors
-    except errors.ErrorWithStatus as e:
-        output = {"error": str(e)}
-        status_code = e.status_code
+    except errors.ErrorWithStatus as err:
+        output = {"error": str(err)}
+        status_code = err.status_code
 
     return json.dumps(output), status_code
 
@@ -70,9 +71,9 @@ def get_user(user_id):
         output = controller.get_user(user_id)
 
     # process errors
-    except errors.ErrorWithStatus as e:
-        output = {"error": str(e)}
-        status_code = e.status_code
+    except errors.ErrorWithStatus as err:
+        output = {"error": str(err)}
+        status_code = err.status_code
 
     return json.dumps(output), status_code
 
@@ -90,8 +91,8 @@ def update_user(user_id):
         output = controller.update_user(user_id, data)
 
     # process errors
-    except errors.ErrorWithStatus as e:
-        output = {"error": str(e)}
-        status_code = e.status_code
+    except errors.ErrorWithStatus as err:
+        output = {"error": str(err)}
+        status_code = err.status_code
 
     return json.dumps(output), status_code

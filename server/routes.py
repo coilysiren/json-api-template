@@ -1,7 +1,10 @@
-# routes.py attaches the views to the routes. It is invoked during server configuration
-# (eg at server startup time)
+"""
+routes.py attaches the views to the routes. It is invoked during server configuration
+(eg at server startup time)
+"""
 
 import flask
+
 import server.views as views
 
 

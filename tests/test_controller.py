@@ -1,15 +1,21 @@
+"""
+tests_controller.py includes a large set of integration tests for the controller
+
+the tests test across both the controller and the database, and generally also
+test schema dumping / loading
+"""
+
 import unittest
 import uuid
 from copy import copy
 
-import pytest
+import sqlalchemy
+import sqlalchemy.orm as orm
+from parameterized import parameterized
 
 import database.connection
 import database.models as models
 import server.errors as errors
-import sqlalchemy
-import sqlalchemy.orm as orm
-from parameterized import parameterized
 from server.controller import controller
 
 
@@ -66,8 +72,8 @@ class TestControllerCreateUser(ControllerTestCase):
             ({"email": 1, "role": "standard"}, errors.InvalidUserInput),
         ]
     )
-    def test_create_user_bad_inputs(self, args, expectedError):
-        with self.assertRaises(expectedError):
+    def test_create_user_bad_inputs(self, args, expected_error):
+        with self.assertRaises(expected_error):
             self.controller.create_user(args)
 
     def test_create_user_valid_input(self):
@@ -140,8 +146,8 @@ class TestControllerGetUsers(ControllerTestCase):
             ({"limit": None}, errors.InvalidUserInput),
         ]
     )
-    def test_get_user_bad_inputs(self, args, expectedError):
-        with self.assertRaises(expectedError):
+    def test_get_user_bad_inputs(self, args, expected_error):
+        with self.assertRaises(expected_error):
             self.controller.get_users(args)
 
     def test_get_multiple(self):
@@ -313,14 +319,14 @@ class TestControllerUpdateUsers(ControllerTestCase):
 
         # logic under test
         new_name = "luna faye"
-        id = create_user_output["id"]
+        _id = create_user_output["id"]
         update_user_input = copy(create_user_output)
         update_user_input.update(givenName=new_name)
-        new_output = self.controller.update_user({"user_id": id}, update_user_input)
+        new_output = self.controller.update_user({"user_id": _id}, update_user_input)
 
         # testing assertions
         self.assertEqual(new_output["givenName"], new_name)
-        self.assertEqual(new_output["id"], id)
+        self.assertEqual(new_output["id"], _id)
 
     def test_update_user_does_not_create_new(self):
         # setup part 1
@@ -329,12 +335,12 @@ class TestControllerUpdateUsers(ControllerTestCase):
         create_user_output = self._create_user(email=email, givenName=old_name)
         # setup part 2
         new_name = "luna faye"
-        id = create_user_output["id"]
+        _id = create_user_output["id"]
         update_user_input = copy(create_user_output)
         update_user_input.update(givenName=new_name)
 
         # logic under test
-        self.controller.update_user({"user_id": id}, update_user_input)
+        self.controller.update_user({"user_id": _id}, update_user_input)
 
         # testing assertions
         output = self.controller.get_users({})
@@ -351,11 +357,11 @@ class TestControllerUpdateUsers(ControllerTestCase):
 
         # logic under test
         new_name = 100
-        id = create_user_output["id"]
+        _id = create_user_output["id"]
         update_user_input = copy(create_user_output)
         update_user_input.update(givenName=new_name)
         with self.assertRaises(errors.InvalidUserInput):
-            self.controller.update_user({"user_id": id}, update_user_input)
+            self.controller.update_user({"user_id": _id}, update_user_input)
 
         # testing assertions
         output = (

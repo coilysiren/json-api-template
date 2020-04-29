@@ -7,6 +7,7 @@ import sqlalchemy
 import sqlalchemy.ext.declarative as sqlalchemy_declarative
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, func
 
+
 # docs => https://docs.sqlalchemy.org/en/13/orm/tutorial.html#declare-a-mapping
 Base = sqlalchemy_declarative.declarative_base()
 

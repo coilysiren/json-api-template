@@ -1,11 +1,13 @@
-# app.py sets up the server configuration, and attaches the views to the routes.
-# It is meant to be run as an entrypoint script, and should fail if there are any
-# obvious fatal configuration issues.
+"""
+app.py sets up the server configuration, and attaches the views to the routes.
+It is meant to be run as an entrypoint script, and should fail if there are any
+obvious fatal configuration issues.
+"""
 
-
-import database.connection
 import dotenv
 import flask
+
+import database.connection
 import server.routes
 from server.controller import controller
 
