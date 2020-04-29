@@ -25,7 +25,6 @@ services:
       - .:/project
     links:
       - database
-      - migrations
 
   migrations:
     container_name: migrations
@@ -50,4 +49,3 @@ services:
       - .:/project
     links:
       - database
-      - migrations
