@@ -22,4 +22,4 @@ def get_database_session() -> orm.Session:
 
     docs => https://docs.sqlalchemy.org/en/13/orm/tutorial.html
     """
-    return orm.sessionmaker(bind=get_database_connection())
+    return orm.sessionmaker(bind=get_database_connection())()

@@ -1,6 +1,7 @@
 import json
 
 import flask
+import server.errors as errors
 from server.controller import controller
 
 
@@ -17,15 +18,16 @@ def create_user():
         output = controller.create_user(data)
 
     # process errors
-    except BaseException:
-        status_code = 500
+    except errors.ErrorWithStatus as e:
+        output = {"error": str(e)}
+        status_code = e.status_code
 
     return json.dumps(output), status_code
 
 
 def get_users():
     # parse inputs
-    data = flask.request.get_json()
+    data = flask.request.args
 
     # initalize outputs
     output = {}
@@ -36,7 +38,8 @@ def get_users():
         output = controller.get_users(data)
 
     # process errors
-    except BaseException:
-        status_code = 500
+    except errors.ErrorWithStatus as e:
+        output = {"error": str(e)}
+        status_code = e.status_code
 
     return json.dumps(output), status_code

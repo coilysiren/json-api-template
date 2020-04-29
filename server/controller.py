@@ -29,7 +29,7 @@ class __Controller(object):
         user = models.User(name=name)
         self.session.add(user)
         self.session.commit()
-        output = user.json()
+        output = user.data
 
         return output
 
@@ -52,7 +52,7 @@ class __Controller(object):
         # process output
         output = {"users": []}
         for user in query:
-            output["users"].append(user.json())
+            output["users"].append(user.data)
 
         return output
 

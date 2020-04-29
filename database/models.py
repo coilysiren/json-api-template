@@ -5,7 +5,7 @@
 
 import sqlalchemy
 import sqlalchemy.ext.declarative as sqlalchemy_declarative
-
+from sqlalchemy import Column, Integer, String
 
 # docs => https://docs.sqlalchemy.org/en/13/orm/tutorial.html#declare-a-mapping
 Base = sqlalchemy_declarative.declarative_base()
@@ -13,13 +13,14 @@ Base = sqlalchemy_declarative.declarative_base()
 
 class User(Base):
     __tablename__ = "users"
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    name = sqlalchemy.Column(sqlalchemy.String)
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
 
     def __repr__(self):
         return f"<User(name='{self.name}')>"
 
-    def json(self):
+    @property
+    def data(self):
         return {
             "id": self.id,
             "name": self.name,
