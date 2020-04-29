@@ -21,6 +21,13 @@ class UserInputSchema(Schema):
     """
     UserInputSchema represents the schema that clients *input* into our server.
     So for example, it is the schema that you should respect when `POST`ing the server.
+
+    Takes in input that looks like so:
+    {
+        "email": "lynncyrin@gmail.com",
+        "role": "engineer",
+        ...
+    }
     """
 
     # required fields
@@ -56,8 +63,9 @@ class UserOutputSchema(UserInputSchema):
 
     When deserialized, it has output like so
     {
-        user_id: 1234,
-        email: lynncyrin@gmail.com,
+        "id": 1234, # <== this is the extra field this class adds
+        "email": "lynncyrin@gmail.com",
+        "role": "engineer",
         ...
     }
     """
@@ -109,8 +117,17 @@ class UserQuerySchema(Schema):
               the schema defines the data from this point, and on.
     """
 
-    page = fields.Integer(default=1)
-    limit = fields.Integer(default=50)
+    # WRT both `default` and `missing` being present here, see
+    #  => https://github.com/marshmallow-code/marshmallow/issues/775
+    page = fields.Integer(default=1, missing=1)
+    limit = fields.Integer(
+        default=50,
+        missing=50,
+        # 1000 is my napkin math estimate for the a number that will prevent the server
+        # overloading the database with massive GET requests
+        validate=[Range(max=1000, error="limit must be less than 1000")],
+    )
+
     roles = fields.List(fields.String)
 
     class Meta:

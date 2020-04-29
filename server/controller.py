@@ -54,12 +54,12 @@ class __Controller(object):
     def get_users(self, data) -> {}:
         # parse inputs (query params)
         try:
-            userQuery = schema.UserQuerySchema().load(data)
+            queryData = schema.UserQuerySchema().load(data)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
         # do business logic (eg. get users)
-        query = self.session.query(models.User).all()
+        query = self.session.query(models.User).limit(queryData["limit"])
 
         # return query results
         output = schema.UserOutputSchema(many=True).load(query)

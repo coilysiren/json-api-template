@@ -141,6 +141,20 @@ class TestControllerGetUsers(ControllerTestCase):
         # testing assertions
         self.assertEqual(len(output["users"]), count)
 
+    def test_get_one_result(self):
+        # setup
+        count = 3
+        for _ in range(count):
+            self._create_user()
+        # logic under test
+        output = self.controller.get_users({"limit": 1})
+        # testing assertions
+        self.assertEqual(len(output["users"]), 1)
+
+    def test_get_limit_too_large(self):
+        with self.assertRaises(errors.InvalidUserInput):
+            self.controller.get_users({"limit": 9999999999999999999})
+
 
 class TestControllerGetUser(ControllerTestCase):
     controller = controller
