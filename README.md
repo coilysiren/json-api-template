@@ -40,26 +40,25 @@ More esoteric commands are listed in the `./scripts/` folder, you will generally
 ```python
 # [ database layer ]
 #
-# -> connection.py
-# -> models.py
+# - connection.py
+# - models.py
 #
 # [ migrations layer ]
 #
-# -> env.py
-# -> versions/*.py
+# - env.py
+# - versions/*.py
 #
 # [ server layer ]
 #
-# -> app.py
-#   -> errors.py
-#   -> routes.py
-#     -> views.py     <-|
-#   -> controller.py  <-- the interesting parts
-#     -> schema.py    <-|
+# - app.py
+#   - errors.py
+#   - routes.py
+#     - views.py     <-|
+#   - controller.py  <-- the interesting parts!
+#     - schema.py    <-|
 #
 # [ tests layer ]
 #
-# -> test_controller.py
-# -> test_decider.py
+# - test_controller.py  <-- also interesting!
 #
 ```
