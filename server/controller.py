@@ -41,7 +41,7 @@ class __Controller(object):
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
-        # do business logic - part 1 (eg. check that there isnt a user with this email)
+        # business logic - part 1 (check that there isnt a user with this email)
         user = (
             self.session.query(models.User).filter_by(email=userData["email"]).first()
         )
@@ -50,7 +50,7 @@ class __Controller(object):
                 "a user already exists with this email address"
             )
 
-        # do business logic - part 2 (eg. create the user)
+        # business logic - part 2 (create the user)
         user = models.User()
         user = schema.UserSchema.update_user(user, userData)
         self.session.add(user)
@@ -67,11 +67,18 @@ class __Controller(object):
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
-        # do business logic (eg. get users)
-        offset = (queryData["page"] - 1) * queryData["limit"]
-        query = self.session.query(models.User).limit(queryData["limit"]).offset(offset)
+        # business logic - part 1 (get users)
+        query = self.session.query(models.User)
+
+        # business logic - part 2 (filter by role)
         if len(queryData["roles"]) != 0:
             query = query.filter(models.User.role.in_(queryData["roles"]))
+
+        # business logic - part 3 (pagination)
+        offset = (queryData["page"] - 1) * queryData["limit"]
+        query = query.limit(queryData["limit"]).offset(offset)
+
+        # business logic - part 4 (bounds checking)
         if query.count() == 0:
             raise errors.NotFound(f"found no users for query input")
 
@@ -86,7 +93,7 @@ class __Controller(object):
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
-        # do business logic (eg. find a user)
+        # business logic (find a user)
         user = self.session.query(models.User).filter_by(id=pathData["user_id"]).first()
         if user is None:
             raise errors.NotFound("a user with the given id could not be found")
@@ -108,12 +115,12 @@ class __Controller(object):
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
-        # do business logic - part 1 (eg. find the user to update)
+        # business logic - part 1 (find the user to update)
         user = self.session.query(models.User).filter_by(id=pathData["user_id"]).first()
         if user is None:
             raise errors.NotFound("a user with the given user_id could not be found")
 
-        # do business logic - part 2 (eg. update the user)
+        # business logic - part 2 (update the user)
         user = models.User()
         user = schema.UserSchema.update_user(user, postData)
         self.session.add(user)

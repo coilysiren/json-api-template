@@ -10,6 +10,8 @@
 - "id" vs "user_id"
 - excluding unknown fields
 - no repeat emails
+- assume that the backend validates roles
+- "the roles listed as a comma-separated list"
 
 ## Development Setup
 

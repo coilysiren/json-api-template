@@ -124,6 +124,10 @@ class TestControllerCreateUser(ControllerTestCase):
         # testing assertions
         self.assertEqual(output["users"][0]["email"], email)
 
+    def test_create_bad_role(self):
+        with self.assertRaises(errors.InvalidUserInput):
+            self._create_user(role="BAD ROLE")
+
 
 class TestControllerGetUsers(ControllerTestCase):
     controller = controller
@@ -159,6 +163,57 @@ class TestControllerGetUsers(ControllerTestCase):
         output = self.controller.get_users({"limit": 1})
         # testing assertions
         self.assertEqual(len(output["users"]), 1)
+
+    def test_get_user_by_role(self):
+        # setup
+        self._create_user(role="admin")
+        # logic under test
+        output = self.controller.get_users({"roles": ["admin"]})
+        # testing assertions
+        self.assertEqual(len(output["users"]), 1)
+
+    def test_get_user_by_role_select_one(self):
+        # setup
+        self._create_user(role="admin")
+        self._create_user(role="standard")
+        # logic under test
+        output = self.controller.get_users({"roles": ["standard"]})
+        # testing assertions
+        self.assertEqual(len(output["users"]), 1)
+
+    def test_get_user_by_role_select_empty(self):
+        with self.assertRaises(errors.InvalidUserInput):
+            self.controller.get_users({"roles": [""]})
+
+    def test_get_user_by_role_select_bad_role(self):
+        with self.assertRaises(errors.InvalidUserInput):
+            self.controller.get_users({"roles": ["BAD ROLE"]})
+
+    def test_get_user_by_role_no_preference(self):
+        # setup
+        self._create_user(role="admin")
+        self._create_user(role="standard")
+        # logic under test
+        output = self.controller.get_users({})
+        # testing assertions
+        self.assertEqual(len(output["users"]), 2)
+
+    def test_get_user_by_role_select_neither(self):
+        # setup
+        self._create_user(role="admin")
+        self._create_user(role="admin")
+        # logic under test
+        with self.assertRaises(errors.NotFound):
+            self.controller.get_users({"roles": ["standard"]})
+
+    def test_get_user_by_role_select_all(self):
+        # setup
+        self._create_user(role="admin")
+        self._create_user(role="standard")
+        # logic under test
+        output = self.controller.get_users({"roles": ["admin", "standard"]})
+        # testing assertions
+        self.assertEqual(len(output["users"]), 2)
 
     def test_get_limit_too_large(self):
         with self.assertRaises(errors.InvalidUserInput):
@@ -281,7 +336,7 @@ class TestControllerUpdateUsers(ControllerTestCase):
         update_user_input = copy(create_user_output)
         update_user_input.update(givenName=new_name)
         with self.assertRaises(errors.InvalidUserInput):
-            self.controller.update_user(id, update_user_input)
+            self.controller.update_user({"user_id": id}, update_user_input)
 
         # testing assertions
         output = (
@@ -291,12 +346,18 @@ class TestControllerUpdateUsers(ControllerTestCase):
         )
         self.assertIsNotNone(output)
 
-    def test_update_user_rejects_bad_json_query(self):
+    def test_update_user_rejects_bad_path_param(self):
         with self.assertRaises(errors.InvalidUserInput):
             self.controller.update_user("BAD USER ID", {})
 
     def test_update_user_not_found(self):
         with self.assertRaises(errors.NotFound):
             self.controller.update_user(
-                {"user_id": 1337}, {"email": "lynn@example.com", "role": "engineer"}
+                {"user_id": 1337}, {"email": "lynn@example.com", "role": "admin"}
+            )
+
+    def test_update_bad_role(self):
+        with self.assertRaises(errors.InvalidUserInput):
+            self.controller.update_user(
+                {"user_id": 1337}, {"email": "lynn@example.com", "role": "BAD ROLE"}
             )
