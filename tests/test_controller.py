@@ -206,29 +206,29 @@ class TestControllerGetUser(ControllerTestCase):
 
     def test_get_not_found(self):
         with self.assertRaises(errors.NotFound):
-            self.controller.get_user(1337)
+            self.controller.get_user({"user_id": 1337})
 
     def test_get_not_found_very_big_number(self):
         with self.assertRaises(errors.NotFound):
             self.controller.get_user(
-                9999999999999999999999999999999999999999999999999999999
+                {"user_id": 9999999999999999999999999999999999999999999999999999999}
             )
 
     def test_get_bad_input_infinity(self):
         with self.assertRaises(errors.InvalidUserInput):
-            self.controller.get_user(float("inf"))
+            self.controller.get_user({"user_id": float("inf")})
 
     def test_get_bad_input_negative(self):
         with self.assertRaises(errors.InvalidUserInput):
-            self.controller.get_user(-1)
+            self.controller.get_user({"user_id": -1})
 
     def test_get_bad_input(self):
         with self.assertRaises(errors.InvalidUserInput):
-            self.controller.get_user("BAD INPUT")
+            self.controller.get_user({"user_id": "BAD INPUT"})
 
     def test_get_bad_input_cat(self):
         with self.assertRaises(errors.InvalidUserInput):
-            self.controller.get_user("🐈")
+            self.controller.get_user({"user_id": "🐈"})
 
     def test_get_one_user(self):
         # setup
@@ -238,7 +238,7 @@ class TestControllerGetUser(ControllerTestCase):
             if i == 2:
                 create_output = self._create_user()
         # logic under test
-        get_output = self.controller.get_user(create_output["id"])
+        get_output = self.controller.get_user({"user_id": create_output["id"]})
         # testing assertions
         self.assertTrue(get_output)
         self.assertEqual(get_output["id"], create_output["id"])
@@ -261,7 +261,7 @@ class TestControllerUpdateUsers(ControllerTestCase):
         id = create_user_output["id"]
         update_user_input = copy(create_user_output)
         update_user_input.update(givenName=new_name)
-        new_output = self.controller.update_user(id, update_user_input)
+        new_output = self.controller.update_user({"user_id": id}, update_user_input)
 
         # testing assertions
         self.assertEqual(new_output["givenName"], new_name)
@@ -298,5 +298,5 @@ class TestControllerUpdateUsers(ControllerTestCase):
     def test_update_user_not_found(self):
         with self.assertRaises(errors.NotFound):
             self.controller.update_user(
-                1337, {"email": "lynn@example.com", "role": "engineer"}
+                {"user_id": 1337}, {"email": "lynn@example.com", "role": "engineer"}
             )

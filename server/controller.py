@@ -37,7 +37,7 @@ class __Controller(object):
     def create_user(self, data) -> {}:
         # parse inputs (json data)
         try:
-            userData = schema.UserInputSchema().load(data)
+            userData = schema.UserSchema().load(data)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
@@ -52,73 +52,75 @@ class __Controller(object):
 
         # do business logic - part 2 (eg. create the user)
         user = models.User()
-        user = schema.UserInputSchema.update_user(user, userData)
+        user = schema.UserSchema.update_user(user, userData)
         self.session.add(user)
         self.session.commit()
 
         # return our created user
-        output = schema.UserOutputSchema().load(user)
+        output = schema.UserSchema().dump(user)
         return output
 
-    def get_users(self, data) -> {}:
+    def get_users(self, queryParams) -> {}:
         # parse inputs (query params)
         try:
-            queryData = schema.UserQuerySchema().load(data)
+            queryData = schema.UserQuerySchema().load(queryParams)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
         # do business logic (eg. get users)
         offset = (queryData["page"] - 1) * queryData["limit"]
         query = self.session.query(models.User).limit(queryData["limit"]).offset(offset)
+        if len(queryData["roles"]) != 0:
+            query = query.filter(models.User.role.in_(queryData["roles"]))
         if query.count() == 0:
             raise errors.NotFound(f"found no users for query input")
 
         # return query results
-        output = schema.UserOutputSchema(many=True).load(query)
+        output = schema.UserSchema(many=True).dump(query)
         return {"users": output}
 
-    def get_user(self, user_id) -> {}:
+    def get_user(self, pathParams: {}) -> {}:
         # parse inputs (path params)
         try:
-            user_id = schema.UserPathSchema().load({"user_id": user_id})["user_id"]
+            pathData = schema.UserPathSchema().load(pathParams)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
         # do business logic (eg. find a user)
-        user = self.session.query(models.User).filter_by(id=user_id).first()
+        user = self.session.query(models.User).filter_by(id=pathData["user_id"]).first()
         if user is None:
             raise errors.NotFound("a user with the given id could not be found")
 
         # return our found user
-        output = schema.UserOutputSchema().load(user)
+        output = schema.UserSchema().dump(user)
         return output
 
-    def update_user(self, user_id, data) -> {}:
+    def update_user(self, pathParams: {}, postBody: {}) -> {}:
         # parse inputs - part 1 (path params)
         try:
-            user_id = schema.UserPathSchema().load({"user_id": user_id})["user_id"]
+            pathData = schema.UserPathSchema().load(pathParams)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
         # parse inputs - part 2 (json data)
         try:
-            userData = schema.UserInputSchema().load(data)
+            postData = schema.UserSchema().load(postBody)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
         # do business logic - part 1 (eg. find the user to update)
-        user = self.session.query(models.User).filter_by(id=user_id).first()
+        user = self.session.query(models.User).filter_by(id=pathData["user_id"]).first()
         if user is None:
             raise errors.NotFound("a user with the given user_id could not be found")
 
         # do business logic - part 2 (eg. update the user)
         user = models.User()
-        user = schema.UserInputSchema.update_user(user, userData)
+        user = schema.UserSchema.update_user(user, postData)
         self.session.add(user)
         self.session.commit()
 
         # return our updated user
-        output = schema.UserOutputSchema().load(user)
+        output = schema.UserSchema().dump(user)
         return output
 
 
