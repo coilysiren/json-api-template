@@ -20,7 +20,6 @@ import database.models as models
 from marshmallow import EXCLUDE, Schema, ValidationError, fields, pre_dump
 from marshmallow.validate import Range
 
-
 # VALID_ROLES is my assumption that we want the backend to validate the list of
 # available roles. I built a system similar to this @ Textio, and there we used
 # a list just like this to validate the role input.
@@ -40,9 +39,9 @@ def roles_must_be_valid(roles: List[str]):
         role_must_be_valid(role)
 
 
-class UserSchema(Schema):
+class UserPostSchema(Schema):
     """
-    UserSchema represents the schema that clients input into our server, or
+    UserPostSchema represents the schema that clients input into our server, or
     recieve as output from our server.
     So for example, it is the schema that you should respect when `POST`ing the server.
 
@@ -76,28 +75,13 @@ class UserSchema(Schema):
         validate=[Range(min=0, error="must not be negative")], dump_only=True
     )
 
-    @classmethod
-    def update_user(cls, user: models.User, data: {}) -> models.User:
-        """
-        update_user takes in a user and schema data, and updates that user with the current schema data
-        """
-        # TODO - if would be nice if this was something like
-        # `data.fields.email.value` instead! Need to check if the
-        # marshmallow API supports that.
-        user.email = data.get("email")
-        user.role = data.get("role")
-        user.familyName = data.get("familyName")
-        user.givenName = data.get("givenName")
-        user.smsUser = data.get("smsUser")
-        return user
-
     class Meta:
         unknown = EXCLUDE
 
 
-class UserPathSchema(Schema):
+class UserPathParamSchema(Schema):
     """
-    UserPathSchema represents the path parameter schema to use when making GET requests
+    UserPathParamSchema represents the path parameter schema to use when making GET requests
     for our users endpoints.
 
     For example, given the request...
@@ -111,9 +95,9 @@ class UserPathSchema(Schema):
     )
 
 
-class UserQuerySchema(Schema):
+class UserQueryParamSchema(Schema):
     """
-    UserQuerySchema represents the query string schema to use when making GET requests
+    UserQueryParamSchema represents the query string schema to use when making GET requests
     for our users endpoints.
 
     For example, given the request...

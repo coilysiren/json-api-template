@@ -71,7 +71,7 @@ class TestControllerCreateUser(ControllerTestCase):
             self.controller.create_user(args)
 
     def test_create_user_valid_input(self):
-        # setup inputs
+        # setup
         email = str(uuid.uuid4()) + "@example.com"
         # logic under test
         output = self._create_user(email=email)
@@ -79,7 +79,7 @@ class TestControllerCreateUser(ControllerTestCase):
         self.assertEqual(output["email"], email)
 
     def test_create_user_no_repeat_emails(self):
-        # setup inputs
+        # setup
         email = str(uuid.uuid4()) + "@example.com"
         # logic under test
         self._create_user(email=email)
@@ -88,7 +88,7 @@ class TestControllerCreateUser(ControllerTestCase):
             self._create_user(email=email)
 
     def test_create_user_session_persistence(self):
-        # setup inputs
+        # setup
         email = str(uuid.uuid4()) + "@example.com"
         # logic under test
         self._create_user(email=email)
@@ -100,7 +100,7 @@ class TestControllerCreateUser(ControllerTestCase):
         self.assertEqual(output.email, email)
 
     def test_create_user_with_uuid_and_control_case(self):
-        # setup inputs
+        # setup
         email = str(uuid.uuid4()) + "@example.com"
         # control assertions
         output = (
@@ -116,7 +116,7 @@ class TestControllerCreateUser(ControllerTestCase):
         self.assertIsNotNone(output)
 
     def test_create_then_get(self):
-        # setup inputs
+        # setup
         email = str(uuid.uuid4()) + "@example.com"
         # logic under test
         self._create_user(email=email)
@@ -303,7 +303,7 @@ class TestControllerUpdateUsers(ControllerTestCase):
     controller = controller
 
     def test_update_user_with_name_change(self):
-        # setup inputs
+        # setup
         email = str(uuid.uuid4()) + "@example.com"
         old_name = "luna cyrin"
         create_user_output = self._create_user(email=email, givenName=old_name)
@@ -320,9 +320,28 @@ class TestControllerUpdateUsers(ControllerTestCase):
 
         # testing assertions
         self.assertEqual(new_output["givenName"], new_name)
+        self.assertEqual(new_output["id"], id)
+
+    def test_update_user_does_not_create_new(self):
+        # setup part 1
+        email = str(uuid.uuid4()) + "@example.com"
+        old_name = "luna cyrin"
+        create_user_output = self._create_user(email=email, givenName=old_name)
+        # setup part 2
+        new_name = "luna faye"
+        id = create_user_output["id"]
+        update_user_input = copy(create_user_output)
+        update_user_input.update(givenName=new_name)
+
+        # logic under test
+        self.controller.update_user({"user_id": id}, update_user_input)
+
+        # testing assertions
+        output = self.controller.get_users({})
+        self.assertEqual(len(output["users"]), 1)
 
     def test_update_user_rejects_bad_json_input(self):
-        # setup inputs
+        # setup
         email = str(uuid.uuid4()) + "@example.com"
         old_name = "luna cyrin"
         create_user_output = self._create_user(email=email, givenName=old_name)

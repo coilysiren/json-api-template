@@ -37,33 +37,33 @@ class __Controller(object):
     def create_user(self, data) -> {}:
         # parse inputs (json data)
         try:
-            userData = schema.UserSchema().load(data)
+            postData = schema.UserPostSchema().load(data)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
         # business logic - part 1 (check that there isnt a user with this email)
-        user = (
-            self.session.query(models.User).filter_by(email=userData["email"]).first()
+        existingUser = (
+            self.session.query(models.User).filter_by(email=postData["email"]).first()
         )
-        if user is not None:
+        if existingUser is not None:
             raise errors.InvalidUserInput(
                 "a user already exists with this email address"
             )
 
         # business logic - part 2 (create the user)
         user = models.User()
-        user = schema.UserSchema.update_user(user, userData)
+        user = self._update_user(user, postData)
         self.session.add(user)
         self.session.commit()
 
         # return our created user
-        output = schema.UserSchema().dump(user)
+        output = schema.UserPostSchema().dump(user)
         return output
 
     def get_users(self, queryParams) -> {}:
         # parse inputs (query params)
         try:
-            queryData = schema.UserQuerySchema().load(queryParams)
+            queryData = schema.UserQueryParamSchema().load(queryParams)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
@@ -83,13 +83,13 @@ class __Controller(object):
             raise errors.NotFound(f"found no users for query input")
 
         # return query results
-        output = schema.UserSchema(many=True).dump(query)
+        output = schema.UserPostSchema(many=True).dump(query)
         return {"users": output}
 
     def get_user(self, pathParams: {}) -> {}:
         # parse inputs (path params)
         try:
-            pathData = schema.UserPathSchema().load(pathParams)
+            pathData = schema.UserPathParamSchema().load(pathParams)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
@@ -99,19 +99,19 @@ class __Controller(object):
             raise errors.NotFound("a user with the given id could not be found")
 
         # return our found user
-        output = schema.UserSchema().dump(user)
+        output = schema.UserPostSchema().dump(user)
         return output
 
     def update_user(self, pathParams: {}, postBody: {}) -> {}:
         # parse inputs - part 1 (path params)
         try:
-            pathData = schema.UserPathSchema().load(pathParams)
+            pathData = schema.UserPathParamSchema().load(pathParams)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
         # parse inputs - part 2 (json data)
         try:
-            postData = schema.UserSchema().load(postBody)
+            postData = schema.UserPostSchema().load(postBody)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
@@ -121,14 +121,28 @@ class __Controller(object):
             raise errors.NotFound("a user with the given user_id could not be found")
 
         # business logic - part 2 (update the user)
-        user = models.User()
-        user = schema.UserSchema.update_user(user, postData)
+        user = self._update_user(user, postData)
         self.session.add(user)
         self.session.commit()
 
         # return our updated user
-        output = schema.UserSchema().dump(user)
+        output = schema.UserPostSchema().dump(user)
         return output
+
+    def _update_user(self, user: models.User, data: {}) -> models.User:
+        """
+        _update_user takes in a user and schema data, and updates
+        that user with the schema data
+        """
+        # TODO - if would be nice if this was something like
+        # `data.fields.email.value` instead! Need to check if the
+        # marshmallow API supports that.
+        user.email = data.get("email")
+        user.role = data.get("role")
+        user.familyName = data.get("familyName")
+        user.givenName = data.get("givenName")
+        user.smsUser = data.get("smsUser")
+        return user
 
 
 # controller singleton, explained briefly above
