@@ -37,7 +37,7 @@ class DBTransactionTestCase(unittest.TestCase):
         self.session.close()
 
 
-class TestController(DBTransactionTestCase):
+class ControllerTestCase(DBTransactionTestCase):
     controller = controller
 
     def setUp(self):
@@ -48,6 +48,10 @@ class TestController(DBTransactionTestCase):
         if email == "":
             email = str(uuid.uuid4()) + "@example.com"
         return self.controller.create_user({"email": email, "role": role, **kwargs})
+
+
+class TestControllerCreateUser(ControllerTestCase):
+    controller = controller
 
     @parameterized.expand(
         [
@@ -65,18 +69,6 @@ class TestController(DBTransactionTestCase):
     def test_create_user_bad_inputs(self, args, expectedError):
         with self.assertRaises(expectedError):
             self.controller.create_user(args)
-
-    @parameterized.expand(
-        [
-            ("", errors.InvalidUserInput),
-            (None, errors.InvalidUserInput),
-            ({"limit": True}, errors.InvalidUserInput),
-            ({"limit": None}, errors.InvalidUserInput),
-        ]
-    )
-    def test_get_user_bad_inputs(self, args, expectedError):
-        with self.assertRaises(expectedError):
-            self.controller.get_users(args)
 
     def test_create_user_valid_input(self):
         # setup inputs
@@ -123,6 +115,22 @@ class TestController(DBTransactionTestCase):
         # testing assertions
         self.assertEqual(output["users"][0]["email"], email)
 
+
+class TestControllerGetUsers(ControllerTestCase):
+    controller = controller
+
+    @parameterized.expand(
+        [
+            ("", errors.InvalidUserInput),
+            (None, errors.InvalidUserInput),
+            ({"limit": True}, errors.InvalidUserInput),
+            ({"limit": None}, errors.InvalidUserInput),
+        ]
+    )
+    def test_get_user_bad_inputs(self, args, expectedError):
+        with self.assertRaises(expectedError):
+            self.controller.get_users(args)
+
     def test_get_multiple(self):
         # setup
         count = 3
@@ -132,6 +140,10 @@ class TestController(DBTransactionTestCase):
         output = self.controller.get_users({})
         # testing assertions
         self.assertEqual(len(output["users"]), count)
+
+
+class TestControllerGetUser(ControllerTestCase):
+    controller = controller
 
     def test_get_not_found(self):
         with self.assertRaises(errors.NotFound):
@@ -153,6 +165,10 @@ class TestController(DBTransactionTestCase):
         # testing assertions
         self.assertTrue(get_output)
         self.assertEqual(get_output["id"], create_output["id"])
+
+
+class TestControllerUpdateUsers(ControllerTestCase):
+    controller = controller
 
     def test_update_user_with_name_change(self):
         # setup inputs
