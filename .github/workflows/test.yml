@@ -17,5 +17,5 @@ jobs:
     - name: Run a one-line script
       run: echo Hello, world!
 
-      - name: install dependencies
+    - name: install dependencies
       run: pip install pipenv && pipenv sync --dev
