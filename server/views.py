@@ -43,7 +43,10 @@ def create_user():
 
 def get_users():
     # parse inputs
-    data = flask.request.args
+    data = dict(flask.request.args)
+
+    # parse the "roles" list, which is different b/c its a list
+    data["roles"] = flask.request.args.getlist("roles")
 
     # initalize outputs
     output = {}
@@ -68,7 +71,7 @@ def get_user(user_id):
 
     # do business logic
     try:
-        output = controller.get_user(user_id)
+        output = controller.get_user({"user_id": user_id})
 
     # process errors
     except errors.ErrorWithStatus as err:
@@ -88,7 +91,7 @@ def update_user(user_id):
 
     # do business logic
     try:
-        output = controller.update_user(user_id, data)
+        output = controller.update_user({"user_id": user_id}, data)
 
     # process errors
     except errors.ErrorWithStatus as err:

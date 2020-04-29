@@ -371,6 +371,28 @@ class TestControllerUpdateUsers(ControllerTestCase):
         )
         self.assertIsNotNone(output)
 
+    def test_update_does_not_unset_fields(self):
+        # setup
+        email = str(uuid.uuid4()) + "@example.com"
+        old_name = "luna cyrin"
+        create_user_output = self._create_user(email=email, givenName=old_name)
+
+        # control assertions
+        self.assertEqual(create_user_output["givenName"], old_name)
+
+        # logic under test
+        _id = create_user_output["id"]
+        new_output = self.controller.update_user({"user_id": _id}, {}) # <= empty update data
+
+        # testing assertions
+        # assert nothing has changed!
+        self.assertEqual(create_user_output["givenName"], new_output["givenName"])
+        self.assertEqual(create_user_output["givenName"], new_output["givenName"])
+        self.assertEqual(create_user_output["email"], new_output["email"])
+        self.assertEqual(create_user_output["role"], new_output["role"])
+        self.assertEqual(create_user_output["id"], new_output["id"])
+        self.assertEqual(create_user_output["smsUser"], new_output["smsUser"])
+
     def test_update_user_rejects_bad_path_param(self):
         with self.assertRaises(errors.InvalidUserInput):
             self.controller.update_user("BAD USER ID", {})

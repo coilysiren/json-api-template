@@ -54,3 +54,29 @@ More esoteric commands are listed in the `./scripts/` folder, you will generally
 
 ## Testing
 
+In addition to running `make test` (or looking at Github Actions) you can run tests manually like so:
+
+```bash
+# if you get a race condition on the database starting up
+# then try `make run` a 2nd time!
+
+make run
+
+brew install httpie
+
+http localhost:8000/users email=lynncyrin@gmail.com role=admin
+http localhost:8000/users
+http localhost:8000/users email=lynncyrin+testing@gmail.com role=standard smsUser=true
+http localhost:8000/users email=BAD_EMAIL
+
+# lists in query strings are a bit weird
+http localhost:8000/users\?roles=standard\&roles=admin
+http localhost:8000/users\?roles=admin
+
+# make note of the id above, as it is needed in the following lines
+# it will most likely be "1"!
+
+http localhost:8000/users/1
+http PUT localhost:8000/users/1 givenName=lynn
+http localhost:8000/users
+```

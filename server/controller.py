@@ -14,6 +14,7 @@ revolve around testing the controller.
 The controller keeps 1 thing in its state: the current database session.
 The session is passed into the controller when the application is starting up.
 """
+import sys
 
 import marshmallow
 import sqlalchemy.orm as orm
@@ -40,7 +41,7 @@ class __Controller:
     def create_user(self, post_body) -> dict:
         # parse inputs (json data)
         try:
-            post_data = schema.UserPostSchema().load(post_body)
+            post_data = schema.UserPostCreateSchema().load(post_body)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
@@ -65,7 +66,7 @@ class __Controller:
         self.session.commit()
 
         # return our created user
-        output = schema.UserPostSchema().dump(user)
+        output = schema.UserPostCreateSchema().dump(user)
         return output
 
     def get_users(self, query_params) -> dict:
@@ -91,7 +92,7 @@ class __Controller:
             raise errors.NotFound("found no users for query input")
 
         # return query results
-        output = schema.UserPostSchema(many=True).dump(query)
+        output = schema.BaseUserPostSchema(many=True).dump(query)
         return {"users": output}
 
     def get_user(self, path_params: dict) -> dict:
@@ -109,7 +110,7 @@ class __Controller:
             raise errors.NotFound("a user with the given id could not be found")
 
         # return our found user
-        output = schema.UserPostSchema().dump(user)
+        output = schema.BaseUserPostSchema().dump(user)
         return output
 
     def update_user(self, path_params: dict, post_body: dict) -> dict:
@@ -121,7 +122,7 @@ class __Controller:
 
         # parse inputs - part 2 (json data)
         try:
-            post_data = schema.UserPostSchema().load(post_body)
+            post_data = schema.UserPostUpdateSchema().load(post_body)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
@@ -138,7 +139,7 @@ class __Controller:
         self.session.commit()
 
         # return our updated user
-        output = schema.UserPostSchema().dump(user)
+        output = schema.BaseUserPostSchema().dump(user)
         return output
 
 
@@ -150,14 +151,25 @@ def update_user(user: models.User, data: dict) -> models.User:
     Its vaguely unclear where this function truly belongs!
     I thoroughly encourage moving it.
     """
+
     # It would be nice if this was something like
     # `data.fields.email.value` instead! Need to check if the
     # marshmallow API supports that.
-    user.email = data.get("email")
-    user.role = data.get("role")
-    user.familyName = data.get("familyName")
-    user.givenName = data.get("givenName")
-    user.smsUser = data.get("smsUser")
+    if data.get("email") is not None:
+        user.email = data.get("email")
+
+    if data.get("role") is not None:
+        user.role = data.get("role")
+
+    if data.get("familyName") is not None:
+        user.familyName = data.get("familyName")
+
+    if data.get("givenName") is not None:
+        user.givenName = data.get("givenName")
+
+    if data.get("smsUser") is not None:
+        user.smsUser = data.get("smsUser")
+
     return user
 
 

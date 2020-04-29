@@ -19,6 +19,7 @@ run: .init ## 🏃🏽‍♀️ Run local web server
 
 name ?= "future optimization: enforce a name here"
 create-migration-revision: .init ## 📝 Create a new migration revision (inputs: name=<name>)
+	docker-compose down
 	docker-compose build migrations
 	docker-compose up -d database
 	docker-compose run --rm migrations
@@ -31,6 +32,7 @@ lint: .init ## 🧹 Run linters
 	docker-compose run --rm tests black --check server tests
 
 test: .init ## ✅ Run tests
+	docker-compose down
 	docker-compose build migrations
 	docker-compose build tests
 	docker-compose up -d database
@@ -38,6 +40,7 @@ test: .init ## ✅ Run tests
 	docker-compose run --rm tests pytest
 
 test-watch: .init ## ✅ Run tests 🦅 and watch for changes
+	docker-compose down
 	docker-compose build migrations
 	docker-compose build tests
 	docker-compose up -d database

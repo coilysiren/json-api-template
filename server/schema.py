@@ -43,9 +43,9 @@ def roles_must_be_valid(roles: List[str]):
 # pylint: disable=R0903
 
 
-class UserPostSchema(Schema):
+class BaseUserPostSchema(Schema):
     """
-    UserPostSchema represents the schema that clients input into our server, or
+    BaseUserPostSchema represents the schema that clients input into our server, or
     recieve as output from our server.
     So for example, it is the schema that you should respect when `POST`ing the server.
 
@@ -63,18 +63,18 @@ class UserPostSchema(Schema):
         "role": "admin",
         ...
     }
+
+    This is a "base" schema, and is expanded via
+        - UserPostCreateSchema (runs on create)
+        - UserPostUpdateSchema (runs on update)
     """
 
-    ##################
-    # required fields
-    ##################
+    ################################
+    # fields altered in subclasses #
+    ################################
 
-    # NOTE! I'm assuming here every user needs an email and a role.
-    #
-    # In a work environment, I would check in with the person who is creating
-    # requirements to see if that is an accurate assumption.
-    email = fields.Email(required=True)
-    role = fields.Str(required=True, validate=role_must_be_valid)
+    email = fields.Email(required=False)
+    role = fields.Str(required=False)
 
     ###################
     # optional fields #
@@ -99,7 +99,7 @@ class UserPostSchema(Schema):
     familyName = fields.Str(validate=validate.Length(max=10000))
     givenName = fields.Str(validate=validate.Length(max=10000))
 
-    smsUser = fields.Boolean(allow_none=True)
+    smsUser = fields.Boolean(default=False, missing=False)
 
     ######################
     # output only fields #
@@ -110,8 +110,49 @@ class UserPostSchema(Schema):
     )
 
     class Meta:
-        """I find excluding unknown fields to be the best "default" behavior"""
+        unknown = EXCLUDE
 
+
+class UserPostCreateSchema(BaseUserPostSchema):
+    """
+    UserPostCreateSchema is the "user create schema" for when you create a user, eg.
+
+        $ http POST /users
+
+    It is distinct from the "user update schema" due to certain fields being
+    required upon user creation - which is an assumption I'm making about the problem
+    space!
+
+    This schema inheritence thing is Complex ™️ so ideally I would spend a few
+    beats working on making it easier to understand.
+    """
+
+    # NOTE! I'm assuming here that we don't want users with duplicate emails.
+    #
+    # In a work environment, I would check in with the person who is creating
+    # requirements to see if that is an accurate assumption.
+    email = fields.Email(required=True)
+    role = fields.Str(required=True, validate=role_must_be_valid)
+
+    class Meta:
+        unknown = EXCLUDE
+
+
+class UserPostUpdateSchema(BaseUserPostSchema):
+    """
+    UserPostUpdateSchema is the "user update schema" for when you update a user, eg.
+
+        $ http PUT /users/1
+
+    It is distinct from the "user create schema" due to all fields being optional.
+    """
+
+    # this is actually identical to the base schema
+    # but its still useful to add these here, for the sake of clarity
+    email = fields.Email(required=False)
+    role = fields.Str(required=False, validate=role_must_be_valid)
+
+    class Meta:
         unknown = EXCLUDE
 
 
