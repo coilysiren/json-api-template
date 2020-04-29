@@ -21,9 +21,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: install prereqs
-        run: |
-          pip install pipenv
-          pipenv sync --dev
+        run: pip install pipenv && pipenv sync --dev
 
       - name: run tests
         run: pipenv run pytest
