@@ -57,8 +57,17 @@ More esoteric commands are listed in the `./scripts/` folder, you will generally
 In addition to running `make test` (or looking at Github Actions) you can run tests manually like so:
 
 ```bash
-# if you get a race condition on the database starting up
+
+# If you get a race condition on the database starting up
 # then try `make run` a 2nd time!
+#
+# Database startup race conditions will manifest as errors such as
+# > "the database system is starting up"
+#
+# If all else fails, run each line in the makefile one at a time
+# waiting 30 seconds after the `docker-compose up -d database` line.
+#
+# Given more time, I would fix this problem ^^
 
 make run
 
