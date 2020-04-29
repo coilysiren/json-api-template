@@ -24,14 +24,17 @@ create-migration-revision: .init ## 📝 Create a new migration revision (inputs
 	docker-compose run --rm migrations
 	docker-compose run --rm migrations alembic -c setup.cfg revision --autogenerate -m "$(name)"
 
+lint: .init ## 🧹 Run linters
+	docker-compose build tests
+	docker-compose run --rm tests pylint --rcfile=./setup.cfg server tests
+	docker-compose run --rm tests isort --check-only **/*.py
+	docker-compose run --rm tests black --check server tests
+
 test: .init ## ✅ Run tests
 	docker-compose build migrations
 	docker-compose build tests
 	docker-compose up -d database
 	docker-compose run --rm migrations
-	docker-compose run --rm tests pylint --rcfile=./setup.cfg server tests
-	docker-compose run --rm tests isort --check-only **/*.py
-	docker-compose run --rm tests black --check server tests
 	docker-compose run --rm tests pytest
 
 test-watch: .init ## ✅ Run tests 🦅 and watch for changes

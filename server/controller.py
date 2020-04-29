@@ -37,7 +37,7 @@ class __Controller:
         """
         self.session = session
 
-    def create_user(self, post_body) -> {}:
+    def create_user(self, post_body) -> dict:
         # parse inputs (json data)
         try:
             post_data = schema.UserPostSchema().load(post_body)
@@ -63,7 +63,7 @@ class __Controller:
         output = schema.UserPostSchema().dump(user)
         return output
 
-    def get_users(self, query_params) -> {}:
+    def get_users(self, query_params) -> dict:
         # parse inputs (query params)
         try:
             query_data = schema.UserQueryParamSchema().load(query_params)
@@ -89,7 +89,7 @@ class __Controller:
         output = schema.UserPostSchema(many=True).dump(query)
         return {"users": output}
 
-    def get_user(self, path_params: {}) -> {}:
+    def get_user(self, path_params: dict) -> dict:
         # parse inputs (path params)
         try:
             path_data = schema.UserPathParamSchema().load(path_params)
@@ -107,7 +107,7 @@ class __Controller:
         output = schema.UserPostSchema().dump(user)
         return output
 
-    def update_user(self, path_params: {}, post_body: {}) -> {}:
+    def update_user(self, path_params: dict, post_body: dict) -> dict:
         # parse inputs - part 1 (path params)
         try:
             path_data = schema.UserPathParamSchema().load(path_params)
@@ -137,7 +137,7 @@ class __Controller:
         return output
 
 
-def update_user(user: models.User, data: {}) -> models.User:
+def update_user(user: models.User, data: dict) -> models.User:
     """
     update_user takes in a user and schema data, and updates
     that user with the schema data
