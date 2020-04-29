@@ -31,6 +31,7 @@ test: .init ## ✅ Run tests
 	docker-compose run --rm migrations
 	docker-compose run --rm tests pylint --rcfile=./setup.cfg server tests
 	docker-compose run --rm tests isort --check-only **/*.py
+	docker-compose run --rm tests black --check server tests
 	docker-compose run --rm tests pytest
 
 test-watch: .init ## ✅ Run tests 🦅 and watch for changes
