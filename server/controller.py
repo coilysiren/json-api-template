@@ -18,16 +18,15 @@ class __Controller(object):
         self.session = session
 
     def create_user(self, data) -> {}:
-        # parse inputs
+        # parse inputs (json data)
         try:
-            userInput = schema.UserInputSchema()
-            userData = userInput.load(data)
+            userData = schema.UserInputSchema().load(data)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
         # do business logic (eg. create a user)
         user = models.User()
-        user = userInput.update_user(user, userData)
+        user = schema.UserInputSchema.update_user(user, userData)
         self.session.add(user)
         self.session.commit()
 
@@ -36,10 +35,9 @@ class __Controller(object):
         return output
 
     def get_users(self, data) -> {}:
-        # parse inputs
+        # parse inputs (query params)
         try:
-            userQuery = schema.UserQuerySchema()
-            userQuery.load(data)
+            userQuery = schema.UserQuerySchema().load(data)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
@@ -51,9 +49,11 @@ class __Controller(object):
         return {"users": output}
 
     def get_user(self, user_id) -> {}:
-        # parse inputs
-        if user_id == "":
-            raise errors.InvalidUserInput("the `user_id` was empty")
+        # parse inputs (path params)
+        try:
+            user_id = schema.UserPathSchema().load({"user_id": user_id})["user_id"]
+        except marshmallow.ValidationError as err:
+            raise errors.InvalidUserInput(err.messages)
 
         # do business logic (eg. find a user)
         user = self.session.query(models.User).filter_by(id=user_id).first()
@@ -65,25 +65,26 @@ class __Controller(object):
         return output
 
     def update_user(self, user_id, data) -> {}:
-        # parse inputs (part 1)
-        if user_id == "":
-            raise errors.InvalidUserInput("the `user_id` was empty")
-
-        # parse inputs (part 2)
+        # parse inputs - part 1 (path params)
         try:
-            userInput = schema.UserInputSchema()
-            userData = userInput.load(data)
+            user_id = schema.UserPathSchema().load({"user_id": user_id})["user_id"]
+        except marshmallow.ValidationError as err:
+            raise errors.InvalidUserInput(err.messages)
+
+        # parse inputs - part 2 (json data)
+        try:
+            userData = schema.UserInputSchema().load(data)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
         # do business logic - part 1 (eg. find the user to update)
         user = self.session.query(models.User).filter_by(id=user_id).first()
         if user is None:
-            raise errors.NotFound("a user with the given id could not be found")
+            raise errors.NotFound("a user with the given user_id could not be found")
 
         # do business logic - part 2 (eg. update the user)
         user = models.User()
-        user = userInput.update_user(user, userData)
+        user = schema.UserInputSchema.update_user(user, userData)
         self.session.add(user)
         self.session.commit()
 

@@ -1,5 +1,6 @@
 import unittest
 import uuid
+from copy import copy
 
 import pytest
 
@@ -43,10 +44,10 @@ class TestController(DBTransactionTestCase):
         session = super().setUp()
         self.controller.set_session(session)
 
-    def _create_user(self, email="", role="standard"):
+    def _create_user(self, email="", role="standard", **kwargs):
         if email == "":
             email = str(uuid.uuid4()) + "@example.com"
-        return self.controller.create_user({"email": email, "role": role})
+        return self.controller.create_user({"email": email, "role": role, **kwargs})
 
     @parameterized.expand(
         [
@@ -54,11 +55,11 @@ class TestController(DBTransactionTestCase):
             (None, errors.InvalidUserInput),
             ({}, errors.InvalidUserInput),
             ({"not_relevant": True}, errors.InvalidUserInput),
-            ({"name": {}}, errors.InvalidUserInput),
-            ({"name": ""}, errors.InvalidUserInput),
-            ({"name": True}, errors.InvalidUserInput),
-            ({"name": None}, errors.InvalidUserInput),
-            ({"name": 1}, errors.InvalidUserInput),
+            ({"email": {}, "role": "standard"}, errors.InvalidUserInput),
+            ({"name": "", "role": "standard"}, errors.InvalidUserInput),
+            ({"email": True, "role": "standard"}, errors.InvalidUserInput),
+            ({"email": None, "role": "standard"}, errors.InvalidUserInput),
+            ({"email": 1, "role": "standard"}, errors.InvalidUserInput),
         ]
     )
     def test_create_user_bad_inputs(self, args, expectedError):
@@ -69,9 +70,8 @@ class TestController(DBTransactionTestCase):
         [
             ("", errors.InvalidUserInput),
             (None, errors.InvalidUserInput),
-            ({"name": True}, errors.InvalidUserInput),
-            ({"name": None}, errors.InvalidUserInput),
-            ({"name": 1}, errors.InvalidUserInput),
+            ({"limit": True}, errors.InvalidUserInput),
+            ({"limit": None}, errors.InvalidUserInput),
         ]
     )
     def test_get_user_bad_inputs(self, args, expectedError):
@@ -83,7 +83,7 @@ class TestController(DBTransactionTestCase):
         email = str(uuid.uuid4()) + "@example.com"
         # logic under test
         output = self._create_user(email=email)
-        # assertions
+        # testing assertions
         self.assertEqual(output["email"], email)
 
     def test_create_user_session_persistence(self):
@@ -91,7 +91,7 @@ class TestController(DBTransactionTestCase):
         email = str(uuid.uuid4()) + "@example.com"
         # logic under test
         self._create_user(email=email)
-        # assertions
+        # testing assertions
         output = (
             self.controller.session.query(models.User).filter_by(email=email).first()
         )
@@ -101,14 +101,14 @@ class TestController(DBTransactionTestCase):
     def test_create_user_with_uuid_and_control_case(self):
         # setup inputs
         email = str(uuid.uuid4()) + "@example.com"
-        # control case
+        # control assertions
         output = (
             self.controller.session.query(models.User).filter_by(email=email).first()
         )
         self.assertIsNone(output)
         # logic under test
         self._create_user(email=email)
-        # test case
+        # testing assertions
         output = (
             self.controller.session.query(models.User).filter_by(email=email).first()
         )
@@ -120,7 +120,7 @@ class TestController(DBTransactionTestCase):
         # logic under test
         self._create_user(email=email)
         output = self.controller.get_users({})
-        # test case
+        # testing assertions
         self.assertEqual(output["users"][0]["email"], email)
 
     def test_get_multiple(self):
@@ -130,5 +130,70 @@ class TestController(DBTransactionTestCase):
             self._create_user()
         # logic under test
         output = self.controller.get_users({})
-        # test case
+        # testing assertions
         self.assertEqual(len(output["users"]), count)
+
+    def test_get_not_found(self):
+        with self.assertRaises(errors.NotFound):
+            self.controller.get_user(1337)
+
+    def test_get_bad_input(self):
+        with self.assertRaises(errors.InvalidUserInput):
+            self.controller.get_user("BAD INPUT")
+
+    def test_get_one_user(self):
+        # setup
+        count = 5
+        create_output = {}
+        for i in range(count):
+            if i == 2:
+                create_output = self._create_user()
+        # logic under test
+        get_output = self.controller.get_user(create_output["id"])
+        # testing assertions
+        self.assertTrue(get_output)
+        self.assertEqual(get_output["id"], create_output["id"])
+
+    def test_update_user_with_name_change(self):
+        # setup inputs
+        email = str(uuid.uuid4()) + "@example.com"
+        old_name = "luna cyrin"
+        create_user_output = self._create_user(email=email, givenName=old_name)
+
+        # control assertions
+        self.assertEqual(create_user_output["givenName"], old_name)
+
+        # logic under test
+        new_name = "luna faye"
+        id = create_user_output["id"]
+        update_user_input = copy(create_user_output)
+        update_user_input.update(givenName=new_name)
+        new_output = self.controller.update_user(id, update_user_input)
+
+        # testing assertions
+        self.assertEqual(new_output["givenName"], new_name)
+
+    def test_update_user_rejects_bad_input(self):
+        # setup inputs
+        email = str(uuid.uuid4()) + "@example.com"
+        old_name = "luna cyrin"
+        create_user_output = self._create_user(email=email, givenName=old_name)
+
+        # control assertions
+        self.assertEqual(create_user_output["givenName"], old_name)
+
+        # logic under test
+        new_name = 100
+        id = create_user_output["id"]
+        update_user_input = copy(create_user_output)
+        update_user_input.update(givenName=new_name)
+        with self.assertRaises(errors.InvalidUserInput):
+            self.controller.update_user(id, update_user_input)
+
+        # testing assertions
+        output = (
+            self.controller.session.query(models.User)
+            .filter_by(givenName=old_name)
+            .first()
+        )
+        self.assertIsNotNone(output)

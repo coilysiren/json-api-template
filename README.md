@@ -7,6 +7,9 @@
 - empty emails? empty roles?
 - no length on names => https://www.w3.org/International/questions/qa-personal-names#singlefield
 - email validation
+- update all user data on PUT
+- "id" vs "user_id"
+- excluding unknown fields
 
 ## Development Setup
 

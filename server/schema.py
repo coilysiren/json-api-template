@@ -9,7 +9,7 @@ The schemas are all defined with marshmallow, which you can read about here
 """
 
 import database.models as models
-from marshmallow import Schema, fields, pre_load
+from marshmallow import EXCLUDE, Schema, fields, pre_load
 
 
 class UserInputSchema(Schema):
@@ -27,7 +27,8 @@ class UserInputSchema(Schema):
     givenName = fields.Str()
     smsUser = fields.Boolean(allow_none=True)
 
-    def update_user(self, user: models.User, data: {}) -> models.User:
+    @classmethod
+    def update_user(cls, user: models.User, data: {}) -> models.User:
         """
         update_user takes in a user and schema data, and updates that user with the current schema data
         """
@@ -38,6 +39,9 @@ class UserInputSchema(Schema):
         user.smsUser = data.get("smsUser")
         return user
 
+    class Meta:
+        unknown = EXCLUDE
+
 
 class UserOutputSchema(UserInputSchema):
     """
@@ -47,7 +51,7 @@ class UserOutputSchema(UserInputSchema):
 
     When deserialized, it has output like so
     {
-        id: 1234,
+        user_id: 1234,
         email: lynncyrin@gmail.com,
         ...
     }
@@ -69,11 +73,28 @@ class UserOutputSchema(UserInputSchema):
             "smsUser": user.smsUser,
         }
 
+    class Meta:
+        unknown = EXCLUDE
+
+
+class UserPathSchema(Schema):
+    """
+    UserPathSchema represents the path parameter schema to use when making GET requests
+    for our users endpoints.
+
+    For example, given the request...
+    GET /users/5000
+               ^
+               the schema defines the data input here
+    """
+
+    user_id = fields.Integer(required=True)
+
 
 class UserQuerySchema(Schema):
     """
     UserQuerySchema represents the query string schema to use when making GET requests
-    for our users endpoint.
+    for our users endpoints.
 
     For example, given the request...
     GET /users?page=20&limit=10
@@ -84,3 +105,6 @@ class UserQuerySchema(Schema):
     page = fields.Integer(default=1)
     limit = fields.Integer(default=50)
     roles = fields.List(fields.String)
+
+    class Meta:
+        unknown = EXCLUDE
