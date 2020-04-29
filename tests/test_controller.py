@@ -382,7 +382,9 @@ class TestControllerUpdateUsers(ControllerTestCase):
 
         # logic under test
         _id = create_user_output["id"]
-        new_output = self.controller.update_user({"user_id": _id}, {}) # <= empty update data
+        # empty update data
+        user_data = {}
+        new_output = self.controller.update_user({"user_id": _id}, user_data)
 
         # testing assertions
         # assert nothing has changed!

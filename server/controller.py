@@ -14,8 +14,6 @@ revolve around testing the controller.
 The controller keeps 1 thing in its state: the current database session.
 The session is passed into the controller when the application is starting up.
 """
-import sys
-
 import marshmallow
 import sqlalchemy.orm as orm
 
