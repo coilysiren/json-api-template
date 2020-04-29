@@ -65,21 +65,53 @@ class UserPostSchema(Schema):
     }
     """
 
+    ##################
     # required fields
+    ##################
+
+    # NOTE! I'm assuming here every user needs an email and a role.
+    #
+    # In a work environment, I would check in with the person who is creating
+    # requirements to see if that is an accurate assumption.
     email = fields.Email(required=True)
     role = fields.Str(required=True, validate=role_must_be_valid)
 
-    # optional fields
-    familyName = fields.Str()
-    givenName = fields.Str()
+    ###################
+    # optional fields #
+    ###################
+
+    # I'm assuming that given the problem space (politics) and the reccommendations
+    # here => https://www.w3.org/International/questions/qa-personal-names
+    # that it is a good decision to avoid trying to limit the lengths of peoples
+    # name inputs.
+    #
+    # That said, our database has limits so we want to avoid people accidentally
+    # copy pasting the entire text of The Illiad into the 1st name field,
+    # since that would simply bring down the database.
+    #
+    # So the max length you see here isn't an attempt at guessing at the max length
+    # of someones name, it is a protective measure to unsure that postgres can
+    # actually store the data.
+    #
+    # 10000 seems like more than enough characters for a name, I think!!!
+    # 1000 would probably also be fine.
+
+    familyName = fields.Str(validate=[Range(max=10000, error="name too long")])
+    givenName = fields.Str(validate=[Range(max=10000, error="name too long")])
+
     smsUser = fields.Boolean(allow_none=True)
 
-    # output only fields
+    ######################
+    # output only fields #
+    ######################
+
     id = fields.Integer(
         validate=[Range(min=0, error="must not be negative")], dump_only=True
     )
 
     class Meta:
+        """I find excluding unknown fields to be the best "default" behavior"""
+
         unknown = EXCLUDE
 
 
@@ -97,6 +129,9 @@ class UserPathParamSchema(Schema):
     user_id = fields.Integer(
         required=True, validate=[Range(min=0, error="must not be negative")]
     )
+
+    class Meta:
+        unknown = EXCLUDE
 
 
 class UserQueryParamSchema(Schema):

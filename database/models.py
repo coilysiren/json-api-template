@@ -23,7 +23,11 @@ class User(Base):
     role = Column(String, nullable=False, default="")
     familyName = Column(String, nullable=False, default="")
     givenName = Column(String, nullable=False, default="")
-    smsUser = Column(Boolean, nullable=False, default=True)
+
+    # I assume the use-case here is "if they do have sms, we will text them"
+    # So I set the default value to False.
+    smsUser = Column(Boolean, nullable=False, default=False)
+
     createTime = Column(DateTime, default=func.now())
     lastModified = Column(DateTime, onupdate=func.now())
 

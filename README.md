@@ -1,18 +1,5 @@
 # bluelink code test
 
-## Decisions Made
-
-- null columns, defaults on columns
-- email and role are required
-- no length on names => https://www.w3.org/International/questions/qa-personal-names#singlefield
-- email validation
-- update all user data on PUT
-- "id" vs "user_id"
-- excluding unknown fields
-- no repeat emails
-- assume that the backend validates roles
-- "the roles listed as a comma-separated list"
-
 ## Development Setup
 
 **[ required ]** This project makes heavy use of docker, so that following tools are the only ones required for building the project in a basic fashion:

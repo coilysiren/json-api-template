@@ -45,6 +45,11 @@ class __Controller:
             raise errors.InvalidUserInput(err.messages)
 
         # business logic - part 1 (check that there isnt a user with this email)
+        #
+        # NOTE! I'm assuming here that we don't want users with duplicate emails.
+        #
+        # In a work environment, I would check in with the person who is creating
+        # requirements to see if that is an accurate assumption.
         existing_user = (
             self.session.query(models.User).filter_by(email=post_data["email"]).first()
         )
