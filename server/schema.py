@@ -6,10 +6,15 @@ The schemas are all defined with marshmallow, which you can read about here
 
 🚨 Changing the keys on the schemas will change the inputs and outputs for our server.
 🚨 So before you change the keys, please check that all of our clients are updated!
+
+The schemas are tested by writing tests for the controllers. We could instead choose to
+test the schemas directly, if they controller tests (and their database calls) become
+too heavy.
 """
 
 import database.models as models
 from marshmallow import EXCLUDE, Schema, fields, pre_load
+from marshmallow.validate import Range
 
 
 class UserInputSchema(Schema):
@@ -88,7 +93,9 @@ class UserPathSchema(Schema):
                the schema defines the data input here
     """
 
-    user_id = fields.Integer(required=True)
+    user_id = fields.Integer(
+        required=True, validate=[Range(min=0, error="id must not be negative")]
+    )
 
 
 class UserQuerySchema(Schema):

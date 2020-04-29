@@ -1,3 +1,20 @@
+"""
+controller.py is responsible for a variety of things:
+    - input validation
+    - session querying
+    - session saving
+    - all other business logic
+
+It utilized via importing the `controller` singleton, rather than
+importing the __Controller class directly (hence the underscores).
+
+The vast majority of our code logic lives in the controller, so all our tests
+revolve around testing the controller.
+
+The controller keeps 1 thing in its state: the current database session.
+The session is passed into the controller when the application is starting up.
+"""
+
 import database.connection
 import database.models as models
 import marshmallow
@@ -93,4 +110,5 @@ class __Controller(object):
         return output
 
 
+# controller singleton, explained briefly above
 controller = __Controller()

@@ -1,3 +1,18 @@
+"""
+view.py is a thin layer used to mapping our routes to our controller logic
+
+The views have no tests primarily because I wanted to avoid writing a bunch of
+integration tests that span across both flask and sqlalchemy. Ultimately I think
+that is a good choice, since integration tests are harder to write when they span
+across more systems.
+
+Because of that fact though, any code inside of the view layer is "dangerous"
+(eg. untested). That means that as much code should be pushed into the controller
+as possible, including the `errors.ErrorWithStatus` logic. Assuming of course,
+that making that change would be in line with how "controllers" are usually
+thought of.
+"""
+
 import json
 
 import flask

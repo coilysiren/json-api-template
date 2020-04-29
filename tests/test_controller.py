@@ -149,9 +149,27 @@ class TestControllerGetUser(ControllerTestCase):
         with self.assertRaises(errors.NotFound):
             self.controller.get_user(1337)
 
+    def test_get_not_found_very_big_number(self):
+        with self.assertRaises(errors.NotFound):
+            self.controller.get_user(
+                9999999999999999999999999999999999999999999999999999999
+            )
+
+    def test_get_bad_input_infinity(self):
+        with self.assertRaises(errors.InvalidUserInput):
+            self.controller.get_user(float("inf"))
+
+    def test_get_bad_input_negative(self):
+        with self.assertRaises(errors.InvalidUserInput):
+            self.controller.get_user(-1)
+
     def test_get_bad_input(self):
         with self.assertRaises(errors.InvalidUserInput):
             self.controller.get_user("BAD INPUT")
+
+    def test_get_bad_input_cat(self):
+        with self.assertRaises(errors.InvalidUserInput):
+            self.controller.get_user("🐈")
 
     def test_get_one_user(self):
         # setup
@@ -189,7 +207,7 @@ class TestControllerUpdateUsers(ControllerTestCase):
         # testing assertions
         self.assertEqual(new_output["givenName"], new_name)
 
-    def test_update_user_rejects_bad_input(self):
+    def test_update_user_rejects_bad_json_input(self):
         # setup inputs
         email = str(uuid.uuid4()) + "@example.com"
         old_name = "luna cyrin"
@@ -213,3 +231,13 @@ class TestControllerUpdateUsers(ControllerTestCase):
             .first()
         )
         self.assertIsNotNone(output)
+
+    def test_update_user_rejects_bad_json_query(self):
+        with self.assertRaises(errors.InvalidUserInput):
+            self.controller.update_user("BAD USER ID", {})
+
+    def test_update_user_not_found(self):
+        with self.assertRaises(errors.NotFound):
+            self.controller.update_user(
+                1337, {"email": "lynn@example.com", "role": "engineer"}
+            )

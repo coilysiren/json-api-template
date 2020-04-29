@@ -53,9 +53,9 @@ More esoteric commands are listed in the `./scripts/` folder, you will generally
 # -> app.py
 #   -> errors.py
 #   -> routes.py
-#     -> views.py
-#   -> controller.py
-#     -> schema.py
+#     -> views.py     <-|
+#   -> controller.py  <-- the interesting parts
+#     -> schema.py    <-|
 #
 # [ tests layer ]
 #
