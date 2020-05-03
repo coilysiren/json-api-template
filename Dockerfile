@@ -9,7 +9,7 @@ WORKDIR /project
 
 # set the PYTHONPATH to our working directory
 # this is necessary primarily for tools like alembic
-# which dont adopt the path that they are being invoked inside of
+# (which are bad at path management)
 ENV PYTHONPATH="/project"
 
 # copy in requirements files
