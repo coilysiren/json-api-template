@@ -19,4 +19,5 @@ COPY Pipfile.lock /project/Pipfile.lock
 # install requirements
 # NOTE! in a production environment, we should not be installing `--dev` requirements all the time
 # instead we should have one "prod" image, and one "dev" image
+# TODO: fix this
 RUN pipenv install --system --dev

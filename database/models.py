@@ -25,4 +25,4 @@ class User(Base):
     lastModified = Column(DateTime, onupdate=func.now())
 
     def __repr__(self):
-        return f"<User({self.name}, {self.email})>"
+        return f'<User(name="{self.name}", email="{self.email}")>'

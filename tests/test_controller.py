@@ -132,6 +132,7 @@ class TestControllerGetUsers(ControllerTestCase):
             output_one["users"][0]["email"], output_two["users"][0]["email"]
         )
 
+    # TODO: get this working
     # def test_sort_by_create_time(self):
     #     # setup
     #     self._create_user(email="one@example.com")

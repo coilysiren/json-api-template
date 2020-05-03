@@ -169,4 +169,6 @@ def update_user(user: models.User, data: dict) -> models.User:
 
 
 # controller singleton, explained briefly at the top of the file
+# TODO: remove the need for this singleton
+# TODO: remove usage of global state
 controller = __Controller()
