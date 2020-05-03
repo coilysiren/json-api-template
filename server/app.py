@@ -19,22 +19,23 @@ def create_app() -> flask.Flask:
 
     docs => https://flask.palletsprojects.com/en/1.1.x/patterns/appfactories/
     """
+
     # environment variables
     dotenv.load_dotenv()
 
-    # flask setup
+    # flask setup (no dependencies)
     app = flask.Flask(__name__)
 
-    # database setup
+    # database setup (no dependencies)
     session = database.connection.get_database_session()
 
-    # controller setup
+    # controller setup (requires the database session)
     controller = Controller(session=session)
 
-    # views setup
+    # views setup (requires the controller)
     views = Views(controller=controller)
 
-    # routes setup
+    # routes setup (requires the app and the views)
     app = routes.setup_routes(app, views)
 
     return app
