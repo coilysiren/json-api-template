@@ -5,10 +5,10 @@ routes.py attaches the views to the routes. It is invoked during server configur
 
 import flask
 
-import server.views as views
+from server.views import Views
 
 
-def setup_routes(app: flask.Flask) -> flask.Flask:
+def setup_routes(app: flask.Flask, views: Views) -> flask.Flask:
     """
     setup_routes attaches our views to our routes
 

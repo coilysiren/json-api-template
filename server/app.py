@@ -8,8 +8,9 @@ import dotenv
 import flask
 
 import database.connection
-import server.routes
-from server.controller import controller
+import server.routes as routes
+from server.controller import Controller
+from server.views import Views
 
 
 def create_app() -> flask.Flask:
@@ -21,11 +22,19 @@ def create_app() -> flask.Flask:
     # environment variables
     dotenv.load_dotenv()
 
-    # flask configuration
+    # flask setup
     app = flask.Flask(__name__)
-    app = server.routes.setup_routes(app)
 
-    # database configuration
-    controller.set_session(database.connection.get_database_session())
+    # database setup
+    session = database.connection.get_database_session()
+
+    # controller setup
+    controller = Controller(session=session)
+
+    # views setup
+    views = Views(controller=controller)
+
+    # routes setup
+    app = routes.setup_routes(app, views)
 
     return app

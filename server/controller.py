@@ -5,12 +5,6 @@ controller.py is responsible for a variety of things:
     - session saving
     - all other business logic
 
-It utilized via importing the `controller` singleton, rather than
-importing the __Controller class directly (hence the underscores).
-
-The vast majority of our code logic lives in the controller, so all our tests
-revolve around testing the controller.
-
 The controller keeps 1 thing in its state: the current database session.
 The session is passed into the controller when the application is starting up.
 """
@@ -22,18 +16,10 @@ import server.errors as errors
 import server.schema as schema
 
 
-# disable the warning about the underscores in our class name
-# pylint: disable=C0103
-
-
-class __Controller:
+class Controller:
     session: orm.Session
 
-    def set_session(self, session):
-        """
-        set_session is used to attach an active database session to the controller.
-        The controller uses the database session later, to do most of its work.
-        """
+    def __init__(self, session: orm.Session):
         self.session = session
 
     def create_user(self, post_body) -> dict:
@@ -165,9 +151,3 @@ def update_user(user: models.User, data: dict) -> models.User:
         user.name = data.get("name")
 
     return user
-
-
-# controller singleton, explained briefly at the top of the file
-# TODO: remove the need for this singleton
-# TODO: remove usage of global state
-controller = __Controller()

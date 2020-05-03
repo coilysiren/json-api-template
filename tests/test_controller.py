@@ -9,16 +9,16 @@ from parameterized import parameterized
 
 import database.models as models
 import server.errors as errors
-from server.controller import controller
+from server.controller import Controller
 from tests.database import DBTransactionTestCase
 
 
 class ControllerTestCase(DBTransactionTestCase):
-    controller = controller
+    controller = Controller
 
     def setUp(self):
         session = super().setUp()
-        self.controller.set_session(session)
+        self.controller = Controller(session=session)
 
     def _create_user(self, email="", **kwargs):
         if email == "":
@@ -27,8 +27,6 @@ class ControllerTestCase(DBTransactionTestCase):
 
 
 class TestControllerCreateUser(ControllerTestCase):
-    controller = controller
-
     @parameterized.expand(
         [
             ("", errors.InvalidUserInput),
@@ -102,8 +100,6 @@ class TestControllerCreateUser(ControllerTestCase):
 
 
 class TestControllerGetUsers(ControllerTestCase):
-    controller = controller
-
     @parameterized.expand(
         [
             ("", errors.InvalidUserInput),
@@ -209,8 +205,6 @@ class TestControllerGetUsers(ControllerTestCase):
 
 
 class TestControllerGetUser(ControllerTestCase):
-    controller = controller
-
     def test_get_not_found(self):
         with self.assertRaises(errors.NotFound):
             self.controller.get_user({"user_id": 1337})
@@ -252,8 +246,6 @@ class TestControllerGetUser(ControllerTestCase):
 
 
 class TestControllerUpdateUsers(ControllerTestCase):
-    controller = controller
-
     def test_update_user_with_name_change(self):
         # setup
         email = str(uuid.uuid4()) + "@example.com"

@@ -1,13 +1,17 @@
 # flask application template
 
-## Development Setup
+A general purpose flask application template.
 
-**[ required ]** This project makes heavy use of docker, so the following tools are the only ones required for building the project in a basic fashion:
+## Development Setup (required)
+
+This project makes heavy use of docker, so the following tools are the only ones required for building the project in a basic fashion:
 
 - docker
 - docker-compose
 
-**[ optional ]** If you want to setup more complex development tooling (editor auto-complete, linters, debugging, etc) then you will also want to install any / all of the following:
+## Development Setup (optional)
+
+If you want to setup more complex development tooling (editor auto-complete, linters, debugging, etc) then you will also want to install any / all of the following:
 
 - homebrew via https://brew.sh/, and the following homebrew installed tools via `brew install $tool`
   - postgres
@@ -42,12 +46,12 @@ More esoteric commands are listed in the `./scripts/` folder, you will generally
 # - app.py
 #   - errors.py
 #   - routes.py
-#     - schema.py    <-|
-#     - views.py     <-- the interesting parts!
-#   - controller.py  <-|
+#     - views.py
+#       - schema.py
+#   - controller.py
 #
 # [ tests layer ]
 #
-# - test_controller.py  <-- also interesting!
+# - test_controller.py
 #
 ```
