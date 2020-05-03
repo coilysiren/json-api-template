@@ -40,7 +40,7 @@ class Controller:
 
         # business logic - create the user
         user = models.User()
-        user = update_user(user, post_data)
+        user = user.update(post_data)
         self.session.add(user)
         self.session.commit()
 
@@ -123,31 +123,10 @@ class Controller:
             raise errors.NotFound("a user with the given user_id could not be found")
 
         # business logic - update the user
-        user = update_user(user, post_data)
+        user = user.update(post_data)
         self.session.add(user)
         self.session.commit()
 
         # return our updated user
         output = schema.UserSchema().dump(user)
         return output
-
-
-def update_user(user: models.User, data: dict) -> models.User:
-    """
-    update_user takes in a user and schema data, and updates
-    that user with the schema data
-
-    Its vaguely unclear where this function truly belongs!
-    I thoroughly encourage moving it.
-    """
-
-    # It would be nice if this was something like
-    # `data.fields.email.value` instead! Need to check if the
-    # marshmallow API supports that.
-    if data.get("email") is not None:
-        user.email = data.get("email")
-
-    if data.get("name") is not None:
-        user.name = data.get("name")
-
-    return user

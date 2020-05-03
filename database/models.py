@@ -26,3 +26,14 @@ class User(Base):
 
     def __repr__(self):
         return f'<User(name="{self.name}", email="{self.email}")>'
+
+    def update(self, data: dict):
+        # TODO: typo annotation for returning self
+
+        if data.get("email") is not None:
+            self.email = data.get("email")
+
+        if data.get("name") is not None:
+            self.name = data.get("name")
+
+        return self
