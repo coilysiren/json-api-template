@@ -16,6 +16,12 @@ services:
     ports:
       - "${DATABASE_PORT}:${DATABASE_PORT}"
 
+  lint:
+    container_name: lint
+    build: .
+    volumes:
+      - .:/project
+
   tests:
     container_name: tests
     build: .

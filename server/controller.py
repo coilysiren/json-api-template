@@ -15,7 +15,6 @@ The controller keeps 1 thing in its state: the current database session.
 The session is passed into the controller when the application is starting up.
 """
 import marshmallow
-import sqlalchemy
 import sqlalchemy.orm as orm
 
 import database.models as models

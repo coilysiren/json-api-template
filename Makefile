@@ -26,10 +26,14 @@ create-migration-revision: .init ## 📝 Create a new migration revision (inputs
 	docker-compose run --rm migrations alembic -c setup.cfg revision --autogenerate -m "$(name)"
 
 lint: .init ## 🧹 Run linters
-	docker-compose build tests
-	docker-compose run --rm tests pylint --rcfile=./setup.cfg server tests
-	docker-compose run --rm tests isort --check-only **/*.py
-	docker-compose run --rm tests black --check server tests
+	docker-compose build lint
+	docker-compose run --rm lint pylint --rcfile=./setup.cfg server tests
+	docker-compose run --rm lint isort --check-only **/*.py
+	docker-compose run --rm lint black --check server tests
+
+lint-autoformat: .init ## 🧹 Run automatic formatters
+	docker-compose build lint
+	docker-compose run --rm lint isort **/*.py
 
 args ?= "" # pytest args go here
 test: .init ## ✅ Run tests (inputs: args=<-k MyTestName|-m slow>)
@@ -47,7 +51,3 @@ test-watch: .init ## ✅ Run tests 🦅 and watch for changes
 	docker-compose build tests
 	docker-compose run --rm migrations
 	docker-compose run --rm tests ptw
-
-autoformat: .init ## 🧹 Run automatic formatters
-	docker-compose build tests
-	docker-compose run --rm tests isort **/*.py

@@ -2,15 +2,11 @@
 tests_controller.py includes a large set of integration tests for the controller
 """
 
-import unittest
 import uuid
 from copy import copy
 
-import sqlalchemy
-import sqlalchemy.orm as orm
 from parameterized import parameterized
 
-import database.connection
 import database.models as models
 import server.errors as errors
 from server.controller import controller
@@ -40,7 +36,7 @@ class TestControllerCreateUser(ControllerTestCase):
             ({}, errors.InvalidUserInput),
             ({"not_relevant": True}, errors.InvalidUserInput),
             ({"email": {}, "name": "lynn"}, errors.InvalidUserInput),
-            ({"name": "", "name": "lynn"}, errors.InvalidUserInput),
+            ({"name": ""}, errors.InvalidUserInput),
             ({"email": True, "name": "lynn"}, errors.InvalidUserInput),
             ({"email": None, "name": "lynn"}, errors.InvalidUserInput),
             ({"email": 1, "name": "lynn"}, errors.InvalidUserInput),
