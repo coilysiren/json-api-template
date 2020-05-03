@@ -7,11 +7,12 @@ help: # automatically documents the makefile, by outputing everything behind a #
 	@./scripts/check_docker.sh
 	@./scripts/check_docker_compose.sh
 
-dev: ## 🛠  setup developement environment
+dev: ## 🛠  setup dev environment
 	PIPENV_VENV_IN_PROJECT=true pipenv install --dev
 
-clean: ## ♻️  cleanup all local docker resources
-	docker system prune -a
+clean: ## ♻️  cleanup all local dev environment, run "make dev" next
+	rm -rf .venv
+	docker system prune -a -f
 
 run: .init ## 🏃🏽‍♀️ Run local web server
 	docker-compose down
