@@ -1,6 +1,4 @@
-# `a27`
-
-🚧 contents under construction 🚧
+# flask application template
 
 ## Development Setup
 
@@ -31,26 +29,25 @@ More esoteric commands are listed in the `./scripts/` folder, you will generally
 ```python
 # [ database layer ]
 #
-# -> connection.py
-# -> models.py
+# - connection.py
+# - models.py
 #
 # [ migrations layer ]
 #
-# -> env.py
-# -> versions/*.py
+# - env.py
+# - versions/*.py
 #
 # [ server layer ]
 #
-# -> app.py
-#   -> errors.py
-#   -> routes.py
-#     -> views.py
-#   -> controller.py
-#     -> decider.py
+# - app.py
+#   - errors.py
+#   - routes.py
+#     - schema.py    <-|
+#     - views.py     <-- the interesting parts!
+#   - controller.py  <-|
 #
 # [ tests layer ]
 #
-# -> test_controller.py
-# -> test_decider.py
+# - test_controller.py  <-- also interesting!
 #
 ```

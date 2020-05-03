@@ -8,12 +8,19 @@ services:
   database:
     container_name: database
     image: postgres:12
+    stop_grace_period: 30s
     environment:
       POSTGRES_DB: "${POSTGRES_DB}"
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     ports:
       - "${DATABASE_PORT}:${DATABASE_PORT}"
+
+  lint:
+    container_name: lint
+    build: .
+    volumes:
+      - .:/project
 
   tests:
     container_name: tests
@@ -23,6 +30,8 @@ services:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}"
     volumes:
       - .:/project
+    links:
+      - database
 
   migrations:
     container_name: migrations
@@ -32,6 +41,8 @@ services:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}"
     volumes:
       - .:/project
+    links:
+      - database
 
   server:
     container_name: server
@@ -43,3 +54,5 @@ services:
       - "${SERVER_PORT}:${SERVER_PORT}"
     volumes:
       - .:/project
+    links:
+      - database
