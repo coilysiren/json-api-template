@@ -17,8 +17,8 @@ def setup_routes(app: flask.Flask, views: Views) -> flask.Flask:
     for method, rule, view in [
         ("POST", "/users", views.create_user),
         ("GET", "/users", views.get_users),
-        ("PUT", "/users/<int:user_id>", views.update_user),
-        ("GET", "/users/<int:user_id>", views.get_user),
+        ("PUT", "/users/<user_id>", views.update_user),
+        ("GET", "/users/<user_id>", views.get_user),
         # TODO: delete
     ]:
         app.add_url_rule(rule, methods=[method], view_func=view)
