@@ -12,6 +12,7 @@ dev: ## 🛠  setup dev environment
 
 clean: ## ♻️  cleanup all local dev environment, run "make dev" next
 	rm -rf .venv
+	docker stop $(shell docker ps -a -q)
 	docker system prune -a -f
 
 run: .init ## 🏃🏽‍♀️ Run local web server

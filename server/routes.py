@@ -14,9 +14,11 @@ def setup_routes(app: flask.Flask, views: Views) -> flask.Flask:
 
     docs => https://flask.palletsprojects.com/en/1.1.x/quickstart/#routing
     """
-    app.route("/users", methods=["POST"])(views.create_user)
-    app.route("/users", methods=["GET"])(views.get_users)
-    app.route("/users/<int:user_id>", methods=["PUT"])(views.update_user)
-    app.route("/users/<int:user_id>", methods=["GET"])(views.get_user)
+    app.add_url_rule("/users", methods=["POST"], view_func=views.create_user)
+    app.add_url_rule("/users", methods=["GET"], view_func=views.get_users)
+    app.add_url_rule(
+        "/users/<int:user_id>", methods=["PUT"], view_func=views.update_user
+    )
+    app.add_url_rule("/users/<int:user_id>", methods=["GET"], view_func=views.get_user)
     # TODO: delete
     return app
