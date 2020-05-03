@@ -1,6 +1,6 @@
-# flask application template
+# json api template
 
-A general purpose flask application template.
+A general purpose json api template.
 
 ## Development Setup (required)
 
