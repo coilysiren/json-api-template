@@ -1,4 +1,4 @@
-# bluelink code test
+# flask application template
 
 ## Development Setup
 
