@@ -32,24 +32,19 @@ class __Controller:
 
     def set_session(self, session):
         """
-        set_session is used to attach an active database session to the controller
-        the controller uses the database session later, to do all of its work
+        set_session is used to attach an active database session to the controller.
+        The controller uses the database session later, to do most of its work.
         """
         self.session = session
 
     def create_user(self, post_body) -> dict:
-        # parse inputs (json data)
+        # parse inputs - json data
         try:
-            post_data = schema.UserPostCreateSchema().load(post_body)
+            post_data = schema.UserSchema().load(post_body)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
-        # business logic - part 1 (check that there isnt a user with this email)
-        #
-        # NOTE! I'm assuming here that we don't want users with duplicate emails.
-        #
-        # In a work environment, I would check in with the person who is creating
-        # requirements to see if that is an accurate assumption.
+        # business logic - check that there isnt a user with this email
         existing_user = (
             self.session.query(models.User).filter_by(email=post_data["email"]).first()
         )
@@ -58,97 +53,97 @@ class __Controller:
                 "a user already exists with this email address"
             )
 
-        # business logic - part 2 (create the user)
+        # business logic - create the user
         user = models.User()
         user = update_user(user, post_data)
         self.session.add(user)
         self.session.commit()
 
         # return our created user
-        output = schema.UserPostCreateSchema().dump(user)
+        output = schema.UserSchema().dump(user)
         return output
 
     def get_users(self, query_params) -> dict:
-        # parse inputs (query params)
+        # parse inputs - query params
         try:
             query_data = schema.UserQueryParamSchema().load(query_params)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
-        # business logic - part 1 (get users)
-        query = self.session.query(models.User).order_by(models.User.id)
+        # business logic - get users
+        query = self.session.query(models.User)
 
-        # business logic - part 2 (filter by role)
-        if len(query_data["roles"]) != 0:
-            query = query.filter(models.User.role.in_(query_data["roles"]))
-
-        # businesss logic - part 3 (sorting)
+        # businesss logic - sorting
         if query_data["sort_by"] != "":
             column = getattr(models.User, query_data["sort_by"])
-
             if query_data["order"] == "desc":
                 query = query.order_by(column.desc())
-
             else:
                 query = query.order_by(column.asc())
+        else:
+            query = query.order_by(models.User.createTime.desc())
 
-        # business logic - part 4 (pagination)
+        # business logic - pagination
         offset = (query_data["page"] - 1) * query_data["limit"]
         query = query.limit(query_data["limit"]).offset(offset)
 
-        # business logic - part 5 (bounds checking)
+        # business logic - bounds checking
         if query.count() == 0:
             raise errors.NotFound("found no users for query input")
 
         # return query results
-        output = schema.BaseUserPostSchema(many=True).dump(query)
+        output = schema.UserSchema(many=True).dump(query)
         return {"users": output}
 
     def get_user(self, path_params: dict) -> dict:
-        # parse inputs (path params)
+        # parse inputs - path params
         try:
             path_data = schema.UserPathParamSchema().load(path_params)
         except marshmallow.ValidationError as err:
             raise errors.InvalidUserInput(err.messages)
 
-        # business logic (find a user)
+        # business logic - find a user
         user = (
-            self.session.query(models.User).filter_by(id=path_data["user_id"]).first()
-        )
-        if user is None:
-            raise errors.NotFound("a user with the given id could not be found")
-
-        # return our found user
-        output = schema.BaseUserPostSchema().dump(user)
-        return output
-
-    def update_user(self, path_params: dict, post_body: dict) -> dict:
-        # parse inputs - part 1 (path params)
-        try:
-            path_data = schema.UserPathParamSchema().load(path_params)
-        except marshmallow.ValidationError as err:
-            raise errors.InvalidUserInput(err.messages)
-
-        # parse inputs - part 2 (json data)
-        try:
-            post_data = schema.UserPostUpdateSchema().load(post_body)
-        except marshmallow.ValidationError as err:
-            raise errors.InvalidUserInput(err.messages)
-
-        # business logic - part 1 (find the user to update)
-        user = (
-            self.session.query(models.User).filter_by(id=path_data["user_id"]).first()
+            self.session.query(models.User)
+            .filter_by(user_id=path_data["user_id"])
+            .first()
         )
         if user is None:
             raise errors.NotFound("a user with the given user_id could not be found")
 
-        # business logic - part 2 (update the user)
+        # return our found user
+        output = schema.UserSchema().dump(user)
+        return output
+
+    def update_user(self, path_params: dict, post_body: dict) -> dict:
+        # parse inputs - path params
+        try:
+            path_data = schema.UserPathParamSchema().load(path_params)
+        except marshmallow.ValidationError as err:
+            raise errors.InvalidUserInput(err.messages)
+
+        # parse inputs - json data
+        try:
+            post_data = schema.UserSchema().load(post_body)
+        except marshmallow.ValidationError as err:
+            raise errors.InvalidUserInput(err.messages)
+
+        # business logic - find the user to update
+        user = (
+            self.session.query(models.User)
+            .filter_by(user_id=path_data["user_id"])
+            .first()
+        )
+        if user is None:
+            raise errors.NotFound("a user with the given user_id could not be found")
+
+        # business logic - update the user
         user = update_user(user, post_data)
         self.session.add(user)
         self.session.commit()
 
         # return our updated user
-        output = schema.BaseUserPostSchema().dump(user)
+        output = schema.UserSchema().dump(user)
         return output
 
 
@@ -167,20 +162,11 @@ def update_user(user: models.User, data: dict) -> models.User:
     if data.get("email") is not None:
         user.email = data.get("email")
 
-    if data.get("role") is not None:
-        user.role = data.get("role")
-
-    if data.get("familyName") is not None:
-        user.familyName = data.get("familyName")
-
-    if data.get("givenName") is not None:
-        user.givenName = data.get("givenName")
-
-    if data.get("smsUser") is not None:
-        user.smsUser = data.get("smsUser")
+    if data.get("name") is not None:
+        user.name = data.get("name")
 
     return user
 
 
-# controller singleton, explained briefly above
+# controller singleton, explained briefly at the top of the file
 controller = __Controller()

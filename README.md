@@ -42,50 +42,12 @@ More esoteric commands are listed in the `./scripts/` folder, you will generally
 # - app.py
 #   - errors.py
 #   - routes.py
-#     - views.py     <-|
-#   - controller.py  <-- the interesting parts!
 #     - schema.py    <-|
+#     - views.py     <-- the interesting parts!
+#   - controller.py  <-|
 #
 # [ tests layer ]
 #
 # - test_controller.py  <-- also interesting!
 #
-```
-
-## Testing
-
-In addition to running `make test` (or looking at Github Actions) you can run tests manually like so:
-
-```bash
-
-# If you get a race condition on the database starting up
-# then try `make run` a 2nd time!
-#
-# Database startup race conditions will manifest as errors such as
-# > "the database system is starting up"
-#
-# If all else fails, run each line in the makefile one at a time
-# waiting 30 seconds after the `docker-compose up -d database` line.
-#
-# Given more time, I would fix this problem ^^
-
-make run
-
-brew install httpie
-
-http localhost:8000/users email=lynncyrin@gmail.com role=admin
-http localhost:8000/users
-http localhost:8000/users email=lynncyrin+testing@gmail.com role=standard smsUser=true
-http localhost:8000/users email=BAD_EMAIL
-
-# lists in query strings are a bit weird
-http localhost:8000/users\?roles=standard\&roles=admin
-http localhost:8000/users\?roles=admin
-
-# Make note of the id above, as it is needed in the following lines.
-# It will most likely be "1"!
-
-http localhost:8000/users/1
-http PUT localhost:8000/users/1 givenName=lynn
-http localhost:8000/users
 ```

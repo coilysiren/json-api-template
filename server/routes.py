@@ -18,4 +18,5 @@ def setup_routes(app: flask.Flask) -> flask.Flask:
     app.route("/users", methods=["GET"])(views.get_users)
     app.route("/users/<int:user_id>", methods=["PUT"])(views.update_user)
     app.route("/users/<int:user_id>", methods=["GET"])(views.get_user)
+    # TODO: delete
     return app

@@ -1,8 +1,5 @@
 """
 tests_controller.py includes a large set of integration tests for the controller
-
-the tests test across both the controller and the database, and generally also
-test schema dumping / loading
 """
 
 import unittest
@@ -17,30 +14,7 @@ import database.connection
 import database.models as models
 import server.errors as errors
 from server.controller import controller
-
-
-class DBTransactionTestCase(unittest.TestCase):
-    connection: sqlalchemy.engine.Engine
-    session: orm.Session
-    transaction: sqlalchemy.engine.Transaction
-
-    @classmethod
-    def setUpClass(cls):
-        engine = database.connection.get_database_connection()
-        cls.connection = engine.connect()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.connection.close()
-
-    def setUp(self):
-        self.session = orm.Session(bind=self.connection)
-        self.transaction = self.connection.begin()
-        return self.session
-
-    def tearDown(self):
-        self.transaction.rollback()
-        self.session.close()
+from tests.database import DBTransactionTestCase
 
 
 class ControllerTestCase(DBTransactionTestCase):
@@ -50,10 +24,10 @@ class ControllerTestCase(DBTransactionTestCase):
         session = super().setUp()
         self.controller.set_session(session)
 
-    def _create_user(self, email="", role="standard", **kwargs):
+    def _create_user(self, email="", **kwargs):
         if email == "":
             email = str(uuid.uuid4()) + "@example.com"
-        return self.controller.create_user({"email": email, "role": role, **kwargs})
+        return self.controller.create_user({"email": email, **kwargs})
 
 
 class TestControllerCreateUser(ControllerTestCase):
@@ -65,11 +39,11 @@ class TestControllerCreateUser(ControllerTestCase):
             (None, errors.InvalidUserInput),
             ({}, errors.InvalidUserInput),
             ({"not_relevant": True}, errors.InvalidUserInput),
-            ({"email": {}, "role": "standard"}, errors.InvalidUserInput),
-            ({"name": "", "role": "standard"}, errors.InvalidUserInput),
-            ({"email": True, "role": "standard"}, errors.InvalidUserInput),
-            ({"email": None, "role": "standard"}, errors.InvalidUserInput),
-            ({"email": 1, "role": "standard"}, errors.InvalidUserInput),
+            ({"email": {}, "name": "lynn"}, errors.InvalidUserInput),
+            ({"name": "", "name": "lynn"}, errors.InvalidUserInput),
+            ({"email": True, "name": "lynn"}, errors.InvalidUserInput),
+            ({"email": None, "name": "lynn"}, errors.InvalidUserInput),
+            ({"email": 1, "name": "lynn"}, errors.InvalidUserInput),
         ]
     )
     def test_create_user_bad_inputs(self, args, expected_error):
@@ -130,10 +104,6 @@ class TestControllerCreateUser(ControllerTestCase):
         # testing assertions
         self.assertEqual(output["users"][0]["email"], email)
 
-    def test_create_bad_role(self):
-        with self.assertRaises(errors.InvalidUserInput):
-            self._create_user(role="BAD ROLE")
-
 
 class TestControllerGetUsers(ControllerTestCase):
     controller = controller
@@ -152,8 +122,8 @@ class TestControllerGetUsers(ControllerTestCase):
 
     def test_sort_by(self):
         # setup
-        user_one = self._create_user(email="one@example.com")
-        use_two = self._create_user(email="two@example.com")
+        self._create_user(email="one@example.com")
+        self._create_user(email="two@example.com")
         # logic under test
         output_one = self.controller.get_users({"sort_by": "email", "order": "asc"})
         output_two = self.controller.get_users({"sort_by": "email", "order": "desc"})
@@ -162,21 +132,21 @@ class TestControllerGetUsers(ControllerTestCase):
             output_one["users"][0]["email"], output_two["users"][0]["email"]
         )
 
-    def test_sort_by_create_time(self):
-        # setup
-        user_one = self._create_user(email="one@example.com")
-        use_two = self._create_user(email="two@example.com")
-        # logic under test
-        output_one = self.controller.get_users(
-            {"sort_by": "createTime", "order": "asc"}
-        )
-        output_two = self.controller.get_users(
-            {"sort_by": "createTime", "order": "desc"}
-        )
-        # testing assertions
-        self.assertNotEqual(
-            output_one["users"][0]["email"], output_two["users"][0]["email"]
-        )
+    # def test_sort_by_create_time(self):
+    #     # setup
+    #     self._create_user(email="one@example.com")
+    #     self._create_user(email="two@example.com")
+    #     # logic under test
+    #     output_one = self.controller.get_users(
+    #         {"sort_by": "createTime", "order": "asc"}
+    #     )
+    #     output_two = self.controller.get_users(
+    #         {"sort_by": "createTime", "order": "desc"}
+    #     )
+    #     # testing assertions
+    #     self.assertNotEqual(
+    #         output_one["users"][0]["email"], output_two["users"][0]["email"]
+    #     )
 
     def test_get_multiple(self):
         # setup
@@ -198,57 +168,6 @@ class TestControllerGetUsers(ControllerTestCase):
         # testing assertions
         self.assertEqual(len(output["users"]), 1)
 
-    def test_get_user_by_role(self):
-        # setup
-        self._create_user(role="admin")
-        # logic under test
-        output = self.controller.get_users({"roles": ["admin"]})
-        # testing assertions
-        self.assertEqual(len(output["users"]), 1)
-
-    def test_get_user_by_role_select_one(self):
-        # setup
-        self._create_user(role="admin")
-        self._create_user(role="standard")
-        # logic under test
-        output = self.controller.get_users({"roles": ["standard"]})
-        # testing assertions
-        self.assertEqual(len(output["users"]), 1)
-
-    def test_get_user_by_role_select_empty(self):
-        with self.assertRaises(errors.InvalidUserInput):
-            self.controller.get_users({"roles": [""]})
-
-    def test_get_user_by_role_select_bad_role(self):
-        with self.assertRaises(errors.InvalidUserInput):
-            self.controller.get_users({"roles": ["BAD ROLE"]})
-
-    def test_get_user_by_role_no_preference(self):
-        # setup
-        self._create_user(role="admin")
-        self._create_user(role="standard")
-        # logic under test
-        output = self.controller.get_users({})
-        # testing assertions
-        self.assertEqual(len(output["users"]), 2)
-
-    def test_get_user_by_role_select_neither(self):
-        # setup
-        self._create_user(role="admin")
-        self._create_user(role="admin")
-        # logic under test
-        with self.assertRaises(errors.NotFound):
-            self.controller.get_users({"roles": ["standard"]})
-
-    def test_get_user_by_role_select_all(self):
-        # setup
-        self._create_user(role="admin")
-        self._create_user(role="standard")
-        # logic under test
-        output = self.controller.get_users({"roles": ["admin", "standard"]})
-        # testing assertions
-        self.assertEqual(len(output["users"]), 2)
-
     def test_get_limit_too_large(self):
         with self.assertRaises(errors.InvalidUserInput):
             self.controller.get_users({"limit": 9999999999999999999})
@@ -261,7 +180,9 @@ class TestControllerGetUsers(ControllerTestCase):
         output_one = self.controller.get_users({"limit": 1, "page": 1})
         output_two = self.controller.get_users({"limit": 1, "page": 2})
         # testing assertions
-        self.assertNotEqual(output_one["users"][0]["id"], output_two["users"][0]["id"])
+        self.assertNotEqual(
+            output_one["users"][0]["user_id"], output_two["users"][0]["user_id"]
+        )
 
     def test_clipped_pagination(self):
         # setup
@@ -327,10 +248,10 @@ class TestControllerGetUser(ControllerTestCase):
             if i == 2:
                 create_output = self._create_user()
         # logic under test
-        get_output = self.controller.get_user({"user_id": create_output["id"]})
+        get_output = self.controller.get_user({"user_id": create_output["user_id"]})
         # testing assertions
         self.assertTrue(get_output)
-        self.assertEqual(get_output["id"], create_output["id"])
+        self.assertEqual(get_output["user_id"], create_output["user_id"])
 
 
 class TestControllerUpdateUsers(ControllerTestCase):
@@ -340,32 +261,33 @@ class TestControllerUpdateUsers(ControllerTestCase):
         # setup
         email = str(uuid.uuid4()) + "@example.com"
         old_name = "luna cyrin"
-        create_user_output = self._create_user(email=email, givenName=old_name)
+        create_user_output = self._create_user(email=email, name=old_name)
 
         # control assertions
-        self.assertEqual(create_user_output["givenName"], old_name)
+        self.assertEqual(create_user_output["name"], old_name)
 
         # logic under test
         new_name = "luna faye"
-        _id = create_user_output["id"]
+        _id = create_user_output["user_id"]
         update_user_input = copy(create_user_output)
-        update_user_input.update(givenName=new_name)
+        update_user_input.update(name=new_name)
         new_output = self.controller.update_user({"user_id": _id}, update_user_input)
 
         # testing assertions
-        self.assertEqual(new_output["givenName"], new_name)
-        self.assertEqual(new_output["id"], _id)
+        self.assertEqual(new_output["name"], new_name)
+        self.assertEqual(new_output["user_id"], _id)
 
     def test_update_user_does_not_create_new(self):
         # setup part 1
         email = str(uuid.uuid4()) + "@example.com"
         old_name = "luna cyrin"
-        create_user_output = self._create_user(email=email, givenName=old_name)
+        create_user_output = self._create_user(email=email, name=old_name)
+
         # setup part 2
         new_name = "luna faye"
-        _id = create_user_output["id"]
+        _id = create_user_output["user_id"]
         update_user_input = copy(create_user_output)
-        update_user_input.update(givenName=new_name)
+        update_user_input.update(name=new_name)
 
         # logic under test
         self.controller.update_user({"user_id": _id}, update_user_input)
@@ -378,50 +300,37 @@ class TestControllerUpdateUsers(ControllerTestCase):
         # setup
         email = str(uuid.uuid4()) + "@example.com"
         old_name = "luna cyrin"
-        create_user_output = self._create_user(email=email, givenName=old_name)
+        create_user_output = self._create_user(email=email, name=old_name)
 
         # control assertions
-        self.assertEqual(create_user_output["givenName"], old_name)
+        self.assertEqual(create_user_output["name"], old_name)
 
         # logic under test
         new_name = 100
-        _id = create_user_output["id"]
+        _id = create_user_output["user_id"]
         update_user_input = copy(create_user_output)
-        update_user_input.update(givenName=new_name)
+        update_user_input.update(name=new_name)
         with self.assertRaises(errors.InvalidUserInput):
             self.controller.update_user({"user_id": _id}, update_user_input)
 
         # testing assertions
         output = (
-            self.controller.session.query(models.User)
-            .filter_by(givenName=old_name)
-            .first()
+            self.controller.session.query(models.User).filter_by(name=old_name).first()
         )
         self.assertIsNotNone(output)
 
-    def test_update_does_not_unset_fields(self):
+    def test_update_does_not_change_fields(self):
         # setup
         email = str(uuid.uuid4()) + "@example.com"
-        old_name = "luna cyrin"
-        create_user_output = self._create_user(email=email, givenName=old_name)
-
-        # control assertions
-        self.assertEqual(create_user_output["givenName"], old_name)
+        create_user_output = self._create_user(email=email, name="luna cyrin")
+        _id = create_user_output["user_id"]
 
         # logic under test
-        _id = create_user_output["id"]
-        # empty update data
-        user_data = {}
-        new_output = self.controller.update_user({"user_id": _id}, user_data)
+        new_output = self.controller.update_user({"user_id": _id}, {"email": email})
 
         # testing assertions
-        # assert nothing has changed!
-        self.assertEqual(create_user_output["givenName"], new_output["givenName"])
-        self.assertEqual(create_user_output["givenName"], new_output["givenName"])
-        self.assertEqual(create_user_output["email"], new_output["email"])
-        self.assertEqual(create_user_output["role"], new_output["role"])
-        self.assertEqual(create_user_output["id"], new_output["id"])
-        self.assertEqual(create_user_output["smsUser"], new_output["smsUser"])
+        self.assertEqual(create_user_output["name"], new_output["name"])
+        self.assertEqual(create_user_output["user_id"], new_output["user_id"])
 
     def test_update_user_rejects_bad_path_param(self):
         with self.assertRaises(errors.InvalidUserInput):
@@ -430,11 +339,5 @@ class TestControllerUpdateUsers(ControllerTestCase):
     def test_update_user_not_found(self):
         with self.assertRaises(errors.NotFound):
             self.controller.update_user(
-                {"user_id": 1337}, {"email": "lynn@example.com", "role": "admin"}
-            )
-
-    def test_update_bad_role(self):
-        with self.assertRaises(errors.InvalidUserInput):
-            self.controller.update_user(
-                {"user_id": 1337}, {"email": "lynn@example.com", "role": "BAD ROLE"}
+                {"user_id": 1337}, {"email": "lynn@example.com"}
             )

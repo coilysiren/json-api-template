@@ -31,13 +31,14 @@ lint: .init ## 🧹 Run linters
 	docker-compose run --rm tests isort --check-only **/*.py
 	docker-compose run --rm tests black --check server tests
 
-test: .init ## ✅ Run tests
+args ?= "" # pytest args go here
+test: .init ## ✅ Run tests (inputs: args=<-k MyTestName|-m slow>)
 	docker-compose down
 	docker-compose up -d database
 	docker-compose build migrations
 	docker-compose build tests
 	docker-compose run --rm migrations
-	docker-compose run --rm tests pytest
+	docker-compose run --rm tests pytest $(args)
 
 test-watch: .init ## ✅ Run tests 🦅 and watch for changes
 	docker-compose down

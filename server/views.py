@@ -45,9 +45,6 @@ def get_users():
     # parse inputs
     data = dict(flask.request.args)
 
-    # parse the "roles" list, which is different b/c its a list
-    data["roles"] = flask.request.args.getlist("roles")
-
     # initalize outputs
     output = {}
     status_code = 200
