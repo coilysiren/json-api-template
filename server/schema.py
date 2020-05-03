@@ -25,9 +25,7 @@ from marshmallow.validate import Range
 class UserSchema(Schema):
     """
     UserSchema represents the schema that clients input into our server, or
-    recieve as output from our server.
-
-    So for example, it is the schema that you should respect when `POST`ing the server.
+    recieve as a response from our server.
 
     For example, given the request...
     $ http POST localhost:8000/users email=lynncyrin@gmail.com
