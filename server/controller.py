@@ -77,8 +77,10 @@ class Controller:
             raise errors.NotFound("found no users for query input")
 
         # return query results
-        output = schema.UserSchema(many=True).dump(query)
-        return {"users": output}
+        results = schema.UserSchema(many=True).dump(query)
+        output = {"users": results}
+
+        return output
 
     def get_user(self, path_params: dict) -> dict:
         # parse inputs - path params
@@ -98,6 +100,7 @@ class Controller:
 
         # return our found user
         output = schema.UserSchema().dump(user)
+
         return output
 
     def update_user(self, path_params: dict, post_body: dict) -> dict:
@@ -129,4 +132,5 @@ class Controller:
 
         # return our updated user
         output = schema.UserSchema().dump(user)
+
         return output
