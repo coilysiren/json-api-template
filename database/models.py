@@ -28,7 +28,12 @@ class User(Base):
         return f'<User(name="{self.name}", email="{self.email}")>'
 
     def update(self, data: dict):
-        # TODO: typo annotation for returning self
+        # TODO: type annotation for returning self
+
+        # this guards against accidental mis-use!
+        # TODO: page someone when this happens
+        if not hasattr(data, "get"):
+            return self
 
         if data.get("email") is not None:
             self.email = data.get("email")
