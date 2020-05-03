@@ -2,12 +2,12 @@
 
 ## Development Setup
 
-**[ required ]** This project makes heavy use of docker, so that following tools are the only ones required for building the project in a basic fashion:
+**[ required ]** This project makes heavy use of docker, so the following tools are the only ones required for building the project in a basic fashion:
 
 - docker
 - docker-compose
 
-**[ optional ]** If you want to setup more complex development tooling (editor auto-complete, linters, debugging, etc) then you will also need all of the following:
+**[ optional ]** If you want to setup more complex development tooling (editor auto-complete, linters, debugging, etc) then you will also want to install any / all of the following:
 
 - homebrew via https://brew.sh/, and the following homebrew installed tools via `brew install $tool`
   - postgres
