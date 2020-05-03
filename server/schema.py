@@ -204,6 +204,17 @@ class UserQueryParamSchema(Schema):
     roles = fields.List(
         fields.String, default=[], missing=[], validate=roles_must_be_valid
     )
+    sort_by = fields.String(
+        default="", missing=""
+    )  # validate that its actually a column name
+    order = fields.String(
+        default="desc", missing="desc"
+    )  # validate that its "desc" "asc"
+
+    # {
+    #   nextUrl: "GET /users?page=2020-01-01-TZUS&limit=2020-02-01-TZUS"
+    # }
+    nextUrl = fields.String()
 
     class Meta:
         unknown = EXCLUDE

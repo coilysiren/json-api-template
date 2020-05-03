@@ -150,6 +150,34 @@ class TestControllerGetUsers(ControllerTestCase):
         with self.assertRaises(expected_error):
             self.controller.get_users(args)
 
+    def test_sort_by(self):
+        # setup
+        user_one = self._create_user(email="one@example.com")
+        use_two = self._create_user(email="two@example.com")
+        # logic under test
+        output_one = self.controller.get_users({"sort_by": "email", "order": "asc"})
+        output_two = self.controller.get_users({"sort_by": "email", "order": "desc"})
+        # testing assertions
+        self.assertNotEqual(
+            output_one["users"][0]["email"], output_two["users"][0]["email"]
+        )
+
+    def test_sort_by_create_time(self):
+        # setup
+        user_one = self._create_user(email="one@example.com")
+        use_two = self._create_user(email="two@example.com")
+        # logic under test
+        output_one = self.controller.get_users(
+            {"sort_by": "createTime", "order": "asc"}
+        )
+        output_two = self.controller.get_users(
+            {"sort_by": "createTime", "order": "desc"}
+        )
+        # testing assertions
+        self.assertNotEqual(
+            output_one["users"][0]["email"], output_two["users"][0]["email"]
+        )
+
     def test_get_multiple(self):
         # setup
         count = 3

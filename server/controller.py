@@ -15,6 +15,7 @@ The controller keeps 1 thing in its state: the current database session.
 The session is passed into the controller when the application is starting up.
 """
 import marshmallow
+import sqlalchemy
 import sqlalchemy.orm as orm
 
 import database.models as models
@@ -75,17 +76,27 @@ class __Controller:
             raise errors.InvalidUserInput(err.messages)
 
         # business logic - part 1 (get users)
-        query = self.session.query(models.User)
+        query = self.session.query(models.User).order_by(models.User.id)
 
         # business logic - part 2 (filter by role)
         if len(query_data["roles"]) != 0:
             query = query.filter(models.User.role.in_(query_data["roles"]))
 
-        # business logic - part 3 (pagination)
+        # businesss logic - part 3 (sorting)
+        if query_data["sort_by"] != "":
+            column = getattr(models.User, query_data["sort_by"])
+
+            if query_data["order"] == "desc":
+                query = query.order_by(column.desc())
+
+            else:
+                query = query.order_by(column.asc())
+
+        # business logic - part 4 (pagination)
         offset = (query_data["page"] - 1) * query_data["limit"]
         query = query.limit(query_data["limit"]).offset(offset)
 
-        # business logic - part 4 (bounds checking)
+        # business logic - part 5 (bounds checking)
         if query.count() == 0:
             raise errors.NotFound("found no users for query input")
 
