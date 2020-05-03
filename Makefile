@@ -10,11 +10,14 @@ help: # automatically documents the makefile, by outputing everything behind a #
 dev: ## 🛠  setup developement environment
 	PIPENV_VENV_IN_PROJECT=true pipenv install --dev
 
+clean: ## ♻️  cleanup all local docker resources
+	docker system prune -a
+
 run: .init ## 🏃🏽‍♀️ Run local web server
 	docker-compose down
 	docker-compose up -d database
 	docker-compose build migrations
-	docker-compose run --rm migrations
+	docker-compose run migrations
 	docker-compose up --remove-orphans --build server
 
 name ?= "TODO: future optimization, enforce a name here"
@@ -22,32 +25,32 @@ create-migration-revision: .init ## 📝 Create a new migration revision (inputs
 	docker-compose down
 	docker-compose up -d database
 	docker-compose build migrations
-	docker-compose run --rm migrations
-	docker-compose run --rm migrations alembic -c setup.cfg revision --autogenerate -m "$(name)"
+	docker-compose run migrations
+	docker-compose run migrations alembic -c setup.cfg revision --autogenerate -m "$(name)"
 
 lint: .init ## 🧹 Run linters
 	docker-compose build lint
-	docker-compose run --rm lint pylint --rcfile=./setup.cfg server tests
-	docker-compose run --rm lint isort --check-only **/*.py
-	docker-compose run --rm lint black --check server tests
+	docker-compose run lint pylint --rcfile=./setup.cfg server tests
+	docker-compose run lint isort --check-only **/*.py
+	docker-compose run lint black --check server tests
 
-lint-autoformat: .init ## 🧹 Run automatic formatters
+lint-autoformat: .init ## 🧹 Run linters with automatic formatting
 	docker-compose build lint
-	docker-compose run --rm lint isort **/*.py
+	docker-compose run lint isort **/*.py
 
 args ?= "" # pytest args go here
-test: .init ## ✅ Run tests (inputs: args=<-k MyTestName|-m slow>)
+test: .init ## ✅ Run tests (inputs: args=<"-k=MyTestName"|"--maxfail=1">)
 	docker-compose down
 	docker-compose up -d database
 	docker-compose build migrations
 	docker-compose build tests
-	docker-compose run --rm migrations
-	docker-compose run --rm tests pytest $(args)
+	docker-compose run migrations
+	docker-compose run tests pytest $(args)
 
 test-watch: .init ## ✅ Run tests 🦅 and watch for changes
 	docker-compose down
 	docker-compose up -d database
 	docker-compose build migrations
 	docker-compose build tests
-	docker-compose run --rm migrations
-	docker-compose run --rm tests ptw
+	docker-compose run migrations
+	docker-compose run tests ptw
