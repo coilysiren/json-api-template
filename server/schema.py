@@ -28,11 +28,13 @@ class UserSchema(Schema):
     recieve as a response from our server.
 
     For example, given the request...
+
     $ http POST localhost:8000/users email=lynncyrin@gmail.com
                                      ^^^^^^^^^^^^^^^^^^^^^^^^^
                                      the schema defines the data input here
 
     This schema is also used for response data, in which case it will look like so...
+
     {
         "user_id": 1234,
         "email": "lynncyrin@gmail.com",
@@ -54,9 +56,10 @@ class UserPathParamSchema(Schema):
     for our users endpoints.
 
     For example, given the request...
-    $ http GET /users/5000
-                      ^^^^
-                      the schema defines the data input here
+
+    $ http GET localhost:8000/users/5000
+                                    ^^^^
+                                    the schema defines the data input here
     """
 
     user_id = fields.Integer(
@@ -73,9 +76,10 @@ class UserQueryParamSchema(Schema):
     for our users endpoints.
 
     For example, given the request...
-    $ http GET /users?page=20&limit=10
-                      ^^^^^^^^^^^^^^^^
-                      the schema defines the data input here
+
+    $ http GET localhost:8000/users?page=20&limit=10
+                                    ^^^^^^^^^^^^^^^^
+                                    the schema defines the data input here
     """
 
     # WRT both `default` and `missing` being present here, see
