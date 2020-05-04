@@ -10,14 +10,15 @@ import falcon
 import database.connection
 from server.user_controller import UserController
 from server.user_views import UserViews
+import server.routes
 
 
-def create_app() -> falcon.API:
+def create_app() -> falcon.App:
     # environment variables
     dotenv.load_dotenv()
 
     # falcon setup (no dependencies)
-    app = falcon.API()
+    app = falcon.App()
 
     # database setup (no dependencies)
     session = database.connection.get_database_session()
@@ -27,7 +28,6 @@ def create_app() -> falcon.API:
     user_views = UserViews(controller=user_controller)
 
     # routes setup (requires the app and the views)
-    app.add_route("/users", user_views, suffix="users")
-    app.add_route("/users/{user_id}", user_views, suffix="user")
+    server.routes.setup_routes(app, user_views)
 
     return app

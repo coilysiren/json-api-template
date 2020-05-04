@@ -35,7 +35,7 @@ class UserViews:
             resp.status_code = err.status_code
 
         # format and return output
-        resp.media = json.dumps(output)
+        resp.media = output
 
     def on_get_users(self, req: falcon.Request, resp: falcon.Response):
         # parse inputs
@@ -54,12 +54,12 @@ class UserViews:
             resp.status_code = err.status_code
 
         # format and return output
-        resp.media = json.dumps(output)
+        resp.media = output
 
-    def on_get_user(self, req: falcon.Request, resp: falcon.Response):
+    def on_get_user(self, req: falcon.Request, resp: falcon.Response, user_id: str):
         # parse inputs
         try:
-            data = schema.UserPathParamSchema().load(req.params)
+            data = schema.UserPathParamSchema().load({"user_id": user_id})
         except marshmallow.ValidationError as err:
             resp.media = json.dumps({"error": err.messages})
             resp.status = falcon.HTTP_400
@@ -73,12 +73,12 @@ class UserViews:
             resp.status_code = err.status_code
 
         # format and return output
-        resp.media = json.dumps(output)
+        resp.media = output
 
-    def on_put_user(self, req: falcon.Request, resp: falcon.Response):
+    def on_put_user(self, req: falcon.Request, resp: falcon.Response, user_id: str):
         # parse inputs - get data
         try:
-            path_data = schema.UserPathParamSchema().load(req.params)
+            path_data = schema.UserPathParamSchema().load({"user_id": user_id})
         except marshmallow.ValidationError as err:
             resp.media = json.dumps({"error": err.messages})
             resp.status = falcon.HTTP_400
@@ -100,4 +100,4 @@ class UserViews:
             resp.status_code = err.status_code
 
         # format and return output
-        resp.media = json.dumps(output)
+        resp.media = output

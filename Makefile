@@ -20,7 +20,7 @@ run: .init ## 🏃🏽‍♀️ Run local web server
 	docker-compose up -d database
 	docker-compose build migrations
 	docker-compose run migrations
-	docker-compose up --remove-orphans --build server
+	docker-compose up --remove-orphans --build logs server
 
 name ?= "TODO: future optimization, enforce a name here"
 create-migration-revision: .init ## 📝 Create a new migration revision (inputs: name=<name>)
