@@ -57,6 +57,7 @@ services:
     command: gunicorn --reload "server.app:create_app()" --bind 0.0.0.0:${SERVER_PORT} --capture-output --log-level debug --error-logfile /var/log/gunicorn.error.log --access-logfile /var/log/gunicorn.access.log
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}"
+      PYTHONUNBUFFERED: "true"
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     volumes:

@@ -23,7 +23,7 @@ class UserViews:
         try:
             data = schema.UserSchema().load(req.params)
         except marshmallow.ValidationError as err:
-            resp.media = json.dumps({"error": err.messages})
+            resp.media = {"error": dict(err.messages)}
             resp.status = falcon.HTTP_400
             return
 
@@ -42,7 +42,7 @@ class UserViews:
         try:
             data = schema.UserQueryParamSchema().load(req.params)
         except marshmallow.ValidationError as err:
-            resp.media = json.dumps({"error": err.messages})
+            resp.media = {"error": dict(err.messages)}
             resp.status = falcon.HTTP_400
             return
 
@@ -61,7 +61,7 @@ class UserViews:
         try:
             data = schema.UserPathParamSchema().load({"user_id": user_id})
         except marshmallow.ValidationError as err:
-            resp.media = json.dumps({"error": err.messages})
+            resp.media = {"error": dict(err.messages)}
             resp.status = falcon.HTTP_400
             return
 
@@ -80,7 +80,7 @@ class UserViews:
         try:
             path_data = schema.UserPathParamSchema().load({"user_id": user_id})
         except marshmallow.ValidationError as err:
-            resp.media = json.dumps({"error": err.messages})
+            resp.media = {"error": dict(err.messages)}
             resp.status = falcon.HTTP_400
             return
 
@@ -88,7 +88,7 @@ class UserViews:
         try:
             body_data = schema.UserSchema().load(req.params)
         except marshmallow.ValidationError as err:
-            resp.media = json.dumps({"error": err.messages})
+            resp.media = {"error": dict(err.messages)}
             resp.status = falcon.HTTP_400
             return
 
