@@ -4,6 +4,7 @@ view.py is a thin layer used to mapping our routes to our controller logic
 
 import json
 
+import falcon
 import marshmallow
 
 import server.errors as errors
@@ -17,84 +18,86 @@ class UserViews:
     def __init__(self, controller: UserController):
         self.controller = controller
 
-    def on_post_users(self, req, resp):
+    def on_post_users(self, req: falcon.Request, resp: falcon.Response):
         # parse inputs
         try:
-            data = schema.UserSchema().load(req)
+            data = schema.UserSchema().load(req.params)
         except marshmallow.ValidationError as err:
-            raise errors.InvalidUserInput(err.messages)
+            resp.media = json.dumps({"error": err.messages})
+            resp.status = falcon.HTTP_400
+            return
 
         # do business logic
         try:
             output = self.controller.create_user(data)
-
-        # process errors
         except errors.ErrorWithStatus as err:
             output = {"error": str(err)}
             resp.status_code = err.status_code
 
         # format and return output
-        json_output = json.dumps(output)
+        resp.media = json.dumps(output)
 
-    def on_get_users(self, req, resp):
+    def on_get_users(self, req: falcon.Request, resp: falcon.Response):
         # parse inputs
         try:
-            data = schema.UserQueryParamSchema().load(req)
+            data = schema.UserQueryParamSchema().load(req.params)
         except marshmallow.ValidationError as err:
-            raise errors.InvalidUserInput(err.messages)
+            resp.media = json.dumps({"error": err.messages})
+            resp.status = falcon.HTTP_400
+            return
 
         # do business logic
         try:
             output = self.controller.get_users(data)
-
-        # process errors
         except errors.ErrorWithStatus as err:
             output = {"error": str(err)}
             resp.status_code = err.status_code
 
         # format and return output
-        json_output = json.dumps(output)
+        resp.media = json.dumps(output)
 
-    def on_get_user(self, req, resp):
+    def on_get_user(self, req: falcon.Request, resp: falcon.Response):
         # parse inputs
         try:
-            data = schema.UserPathParamSchema().load(req)
+            data = schema.UserPathParamSchema().load(req.params)
         except marshmallow.ValidationError as err:
-            raise errors.InvalidUserInput(err.messages)
+            resp.media = json.dumps({"error": err.messages})
+            resp.status = falcon.HTTP_400
+            return
 
         # do business logic
         try:
             output = self.controller.get_user(data)
-
-        # process errors
         except errors.ErrorWithStatus as err:
             output = {"error": str(err)}
             resp.status_code = err.status_code
 
         # format and return output
-        json_output = json.dumps(output)
+        resp.media = json.dumps(output)
 
-    def on_put_user(self, req, resp):
-        # parse inputs
+    def on_put_user(self, req: falcon.Request, resp: falcon.Response):
+        # parse inputs - get data
         try:
-            path_data = schema.UserPathParamSchema().load(req)
+            path_data = schema.UserPathParamSchema().load(req.params)
         except marshmallow.ValidationError as err:
-            raise errors.InvalidUserInput(err.messages)
+            resp.media = json.dumps({"error": err.messages})
+            resp.status = falcon.HTTP_400
+            return
 
         # parse inputs - json data
         try:
-            body_data = schema.UserSchema().load(req)
+            body_data = schema.UserSchema().load(req.params)
         except marshmallow.ValidationError as err:
-            raise errors.InvalidUserInput(err.messages)
+            resp.media = json.dumps({"error": err.messages})
+            resp.status = falcon.HTTP_400
+            return
 
         # do business logic
         try:
             output = self.controller.update_user(path_data, body_data)
-
-        # process errors
         except errors.ErrorWithStatus as err:
             output = {"error": str(err)}
             resp.status_code = err.status_code
 
         # format and return output
-        json_output = json.dumps(output)
+        resp.media = json.dumps(output)
