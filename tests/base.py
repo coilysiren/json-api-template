@@ -1,12 +1,12 @@
 import unittest
+import uuid
 
+import database.connection
 import sqlalchemy
 import sqlalchemy.orm as orm
 
-import database.connection
 
-
-class DBTransactionTestCase(unittest.TestCase):
+class TransactionTestingBaseClass(unittest.TestCase):
     connection: sqlalchemy.engine.Engine
     session: orm.Session
     transaction: sqlalchemy.engine.Transaction

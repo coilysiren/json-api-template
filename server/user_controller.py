@@ -16,14 +16,14 @@ import server.errors as errors
 import server.schema as schema
 
 
-class Controller:
+class UserController:
     session: orm.Session
 
     def __init__(self, session: orm.Session):
         self.session = session
 
     def create_user(self, data) -> dict:
-        # business logic - check that there isnt a user with this email
+        # check that there isnt a user with this email
         existing_user = (
             self.session.query(models.User).filter_by(email=data["email"]).first()
         )
@@ -32,7 +32,7 @@ class Controller:
                 "a user already exists with this email address"
             )
 
-        # business logic - create the user
+        # create the user
         user = models.User()
         user = user.update(data)
         self.session.add(user)
@@ -43,7 +43,7 @@ class Controller:
         return output
 
     def get_users(self, data) -> dict:
-        # business logic - get users
+        # get users
         query = self.session.query(models.User)
 
         # businesss logic - sorting
@@ -56,11 +56,11 @@ class Controller:
         else:
             query = query.order_by(models.User.createTime.desc())
 
-        # business logic - pagination
+        # pagination
         offset = (data["page"] - 1) * data["limit"]
         query = query.limit(data["limit"]).offset(offset)
 
-        # business logic - bounds checking
+        # bounds checking
         if query.count() == 0:
             raise errors.NotFound("found no users for query input")
 
@@ -70,7 +70,7 @@ class Controller:
         return output
 
     def get_user(self, data: dict) -> dict:
-        # business logic - find a user
+        # find a user
         user = (
             self.session.query(models.User).filter_by(user_id=data["user_id"]).first()
         )
@@ -82,7 +82,7 @@ class Controller:
         return output
 
     def update_user(self, path_data: dict, body_data: dict) -> dict:
-        # business logic - find the user to update
+        # find the user to update
         user = (
             self.session.query(models.User)
             .filter_by(user_id=path_data["user_id"])
@@ -91,7 +91,7 @@ class Controller:
         if user is None:
             raise errors.NotFound("a user with the given user_id could not be found")
 
-        # business logic - update the user
+        # update the user
         user = user.update(body_data)
         self.session.add(user)
         self.session.commit()

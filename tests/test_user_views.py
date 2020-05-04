@@ -5,28 +5,29 @@ tests_controller.py includes a large set of integration tests for the controller
 import uuid
 from copy import copy
 
-from parameterized import parameterized
-
 import database.models as models
 import server.errors as errors
-from server.controller import Controller
-from tests.database import DBTransactionTestCase
+from parameterized import parameterized
+from server.user_controller import UserController
+from server.user_views import UserViews
+from tests.base import TransactionTestingBaseClass
 
 
-class ControllerTestCase(DBTransactionTestCase):
-    controller = Controller
+class UserViewTestingBaseClass(TransactionTestingBaseClass):
+    views = UserViews
 
     def setUp(self):
         session = super().setUp()
-        self.controller = Controller(session=session)
+        controller = UserController(session=session)
+        self.views = UserViews(controller=controller)
 
     def _create_user(self, email="", **kwargs):
         if email == "":
             email = str(uuid.uuid4()) + "@example.com"
-        return self.controller.create_user({"email": email, **kwargs})
+        return self.views.on_post_users({"email": email, **kwargs}, {})
 
 
-class TestControllerCreateUser(ControllerTestCase):
+class TestCreateUser(UserViewTestingBaseClass):
     @parameterized.expand(
         [
             ("", errors.InvalidUserInput),
@@ -99,7 +100,7 @@ class TestControllerCreateUser(ControllerTestCase):
         self.assertEqual(output["users"][0]["email"], email)
 
 
-class TestControllerGetUsers(ControllerTestCase):
+class TestGetUsers(UserViewTestingBaseClass):
     @parameterized.expand(
         [
             ("", errors.InvalidUserInput),
@@ -204,7 +205,7 @@ class TestControllerGetUsers(ControllerTestCase):
             self.controller.get_users({"page": 9999999999})
 
 
-class TestControllerGetUser(ControllerTestCase):
+class TestGetUser(UserViewTestingBaseClass):
     def test_get_not_found(self):
         with self.assertRaises(errors.NotFound):
             self.controller.get_user({"user_id": 1337})
@@ -245,7 +246,7 @@ class TestControllerGetUser(ControllerTestCase):
         self.assertEqual(get_output["user_id"], create_output["user_id"])
 
 
-class TestControllerUpdateUsers(ControllerTestCase):
+class TestUpdateUsers(UserViewTestingBaseClass):
     def test_update_user_with_name_change(self):
         # setup
         email = str(uuid.uuid4()) + "@example.com"
