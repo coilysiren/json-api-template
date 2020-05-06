@@ -22,4 +22,5 @@ class UserTestClient(TestClient):
 
 
 class TestCreateUser(UserTestClient):
-    pass
+    def test_placeholder(self):
+        return self
