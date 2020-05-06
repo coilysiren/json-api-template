@@ -39,6 +39,7 @@ lint: .init ## 🧹 Run linters
 lint-autoformat: .init ## 🧹 Run linters with automatic formatting
 	docker-compose build lint
 	docker-compose run lint isort **/*.py
+	docker-compose run lint black server tests
 
 args ?= "" # pytest args go here
 test: .init ## ✅ Run tests (inputs: args=<"-k=MyTestName"|"--maxfail=1">)

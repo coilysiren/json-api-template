@@ -5,37 +5,31 @@ obvious fatal configuration issues.
 """
 
 import dotenv
-import flask
+import falcon
 
 import database.connection
-import server.routes as routes
-from server.controller import Controller
-from server.views import Views
+import server.routes
+from server.user_controller import UserController
+from server.user_views import UserViews
 
 
-def create_app() -> flask.Flask:
-    """
-    create_app creates the flask application
-
-    docs => https://flask.palletsprojects.com/en/1.1.x/patterns/appfactories/
-    """
-
+def create_app(database_session=None) -> falcon.App:
     # environment variables
     dotenv.load_dotenv()
 
-    # flask setup (no dependencies)
-    app = flask.Flask(__name__)
+    # falcon setup (no dependencies)
+    app = falcon.App()
 
     # database setup (no dependencies)
-    session = database.connection.get_database_session()
+    # the `database_session` arg is passed in during tests
+    if database_session is None:
+        database_session = database.connection.get_database_session()
 
-    # controller setup (requires the database session)
-    controller = Controller(session=session)
-
-    # views setup (requires the controller)
-    views = Views(controller=controller)
+    # view + controller setup (requires the database session)
+    user_controller = UserController(session=database_session)
+    user_views = UserViews(controller=user_controller)
 
     # routes setup (requires the app and the views)
-    app = routes.setup_routes(app, views)
+    server.routes.setup_routes(app, user_views)
 
     return app

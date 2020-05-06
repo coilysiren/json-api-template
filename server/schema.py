@@ -25,19 +25,18 @@ from marshmallow.validate import Range
 class UserSchema(Schema):
     """
     UserSchema represents the schema that clients input into our server, or
-    recieve as output from our server.
+    recieve as a response from our server.
 
-    So for example, it is the schema that you should respect when `POST`ing the server.
+    For example, given the request...
 
-    When used as input, it looks like so:
+    $ http POST localhost:8000/users email=lynncyrin@gmail.com
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+                                     the schema defines the data input here
+
+    This schema is also used for response data, in which case it will look like so...
+
     {
-        "email": "lynncyrin@gmail.com",
-        ...
-    }
-
-    When used as output, it looks like so:
-    {
-        "user_id": 1234, # <== newly added
+        "user_id": 1234,
         "email": "lynncyrin@gmail.com",
         ...
     }
@@ -57,9 +56,10 @@ class UserPathParamSchema(Schema):
     for our users endpoints.
 
     For example, given the request...
-    GET /users/5000
-               ^
-               the schema defines the data input here
+
+    $ http GET localhost:8000/users/5000
+                                    ^^^^
+                                    the schema defines the data input here
     """
 
     user_id = fields.Integer(
@@ -76,9 +76,10 @@ class UserQueryParamSchema(Schema):
     for our users endpoints.
 
     For example, given the request...
-    GET /users?page=20&limit=10
-              ^
-              the schema defines the data from this point, and on.
+
+    $ http GET localhost:8000/users?page=20&limit=10
+                                    ^^^^^^^^^^^^^^^^
+                                    the schema defines the data input here
     """
 
     # WRT both `default` and `missing` being present here, see

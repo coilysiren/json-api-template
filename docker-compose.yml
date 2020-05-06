@@ -47,9 +47,17 @@ services:
   server:
     container_name: server
     build: .
-    command: flask run --port ${SERVER_PORT} --host 0.0.0.0
+    command: >
+      gunicorn
+        --reload "server.app:create_app()"
+        --bind 0.0.0.0:${SERVER_PORT}
+        --capture-output
+        --log-level debug
+        --error-logfile "-"
+        --enable-stdio-inheritance
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}"
+      PYTHONUNBUFFERED: "true"
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     volumes:

@@ -1,25 +1,9 @@
-"""
-routes.py attaches the views to the routes. It is invoked during server configuration
-(eg at server startup time)
-"""
+import falcon
 
-import flask
-
-from server.views import Views
+from server.user_views import UserViews
 
 
-def setup_routes(app: flask.Flask, views: Views) -> flask.Flask:
-    """
-    setup_routes attaches our views to our routes
-
-    docs => https://flask.palletsprojects.com/en/1.1.x/quickstart/#routing
-    """
-    for method, rule, view in [
-        ("POST", "/users", views.create_user),
-        ("GET", "/users", views.get_users),
-        ("PUT", "/users/<user_id>", views.update_user),
-        ("GET", "/users/<user_id>", views.get_user),
-        # TODO: delete
-    ]:
-        app.add_url_rule(rule, methods=[method], view_func=view)
+def setup_routes(app: falcon.App, user_views: UserViews) -> falcon.App:
+    app.add_route("/users", user_views, suffix="users")
+    app.add_route("/users/{user_id}", user_views, suffix="user")
     return app
