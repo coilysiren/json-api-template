@@ -7,9 +7,6 @@ RUN pip install pipenv
 # all our work happens here
 WORKDIR /project
 
-# initalize the logging directory
-RUN mkdir -p /var/log
-
 # set the PYTHONPATH to our working directory
 # this is necessary primarily for tools like alembic
 # (which are bad at path management)
@@ -23,4 +20,4 @@ COPY Pipfile.lock /project/Pipfile.lock
 # NOTE! in a production environment, we should not be installing `--dev` requirements all the time
 # instead we should have one "prod" image, and one "dev" image
 # TODO: fix this
-RUN pipenv install --system --dev --verbose
+RUN pipenv install --system --dev

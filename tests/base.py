@@ -1,6 +1,7 @@
 import unittest
 
 import falcon
+import falcon.testing
 import sqlalchemy
 import sqlalchemy.orm as orm
 

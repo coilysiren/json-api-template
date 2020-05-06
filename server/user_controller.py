@@ -1,6 +1,5 @@
 """
 controller.py is responsible for a variety of things:
-    - input validation
     - session querying
     - session saving
     - all other business logic
