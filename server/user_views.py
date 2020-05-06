@@ -2,8 +2,6 @@
 view.py is a thin layer used to mapping our routes to our controller logic
 """
 
-import json
-
 import falcon
 import marshmallow
 
@@ -56,7 +54,7 @@ class UserViews:
         # format and return output
         resp.media = output
 
-    def on_get_user(self, req: falcon.Request, resp: falcon.Response, user_id: str):
+    def on_get_user(self, _: falcon.Request, resp: falcon.Response, user_id: str):
         # parse inputs
         try:
             data = schema.UserPathParamSchema().load({"user_id": user_id})

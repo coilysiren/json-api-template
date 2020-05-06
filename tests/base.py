@@ -1,30 +1,42 @@
 import unittest
-import uuid
 
-import database.connection
+import falcon
 import sqlalchemy
 import sqlalchemy.orm as orm
 
+import database.connection
+import server.app
 
-class TransactionTestingBaseClass(unittest.TestCase):
-    connection: sqlalchemy.engine.Engine
-    session: orm.Session
-    transaction: sqlalchemy.engine.Transaction
+
+class TestClient(unittest.TestCase):
+    # falcon testing client, used by subclasses
+    client: falcon.testing.TestClient
+
+    # database transaction state, used internally
+    _connection: sqlalchemy.engine.Engine
+    _session: orm.Session
+    _transaction: sqlalchemy.engine.Transaction
 
     @classmethod
     def setUpClass(cls):
+        # database transaction setup
+        # docs => https://docs.sqlalchemy.org/en/13/orm/session_transaction.html
         engine = database.connection.get_database_connection()
-        cls.connection = engine.connect()
+        cls._connection = engine.connect()
+        cls._session = orm.Session(bind=cls._connection)
+
+        # falcon testing client setup
+        # docs => https://falcon.readthedocs.io/en/stable/api/testing.html
+        app = server.app.create_app(cls._session)
+        cls.app = falcon.testing.TestClient(app)
 
     @classmethod
     def tearDownClass(cls):
-        cls.connection.close()
+        cls._connection.close()
+        cls._session.close()
 
     def setUp(self):
-        self.session = orm.Session(bind=self.connection)
-        self.transaction = self.connection.begin()
-        return self.session
+        self._transaction = self._connection.begin()
 
     def tearDown(self):
-        self.transaction.rollback()
-        self.session.close()
+        self._transaction.rollback()
