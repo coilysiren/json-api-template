@@ -12,4 +12,4 @@ command -v docker-compose >/dev/null 2>&1 || { echo >&2 "docker-compose needs to
 # rather than pointing directly to the docker docs
 #
 # the motivation there being that docker has multiple installation modes
-# and companies likely wnat to enforce people using a specific one
+# and companies likely want to enforce people using a specific one
